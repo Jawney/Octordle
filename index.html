@@ -22,8 +22,8 @@
             --absent: #3a3a3c;
             --border: #3a3a3c;
             --empty: #121213;
-            --tile-size: 20px; /* Will be dynamically updated */
-            --vh: 1vh;
+            --tile-size: 20px;
+            --vh: 100vh;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
@@ -34,7 +34,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
-            height: calc(var(--vh, 1vh) * 100);
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -43,27 +43,41 @@
         }
 
         header {
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 10px;
-            border-bottom: 1px solid var(--border);
+            padding: 15px 15px 5px 15px;
             flex-shrink: 0;
             background: var(--bg);
-            padding-top: env(safe-area-inset-top);
+            padding-top: calc(10px + env(safe-area-inset-top));
         }
 
-        header h1 { font-size: 0.9rem; margin: 0; letter-spacing: 1px; }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        header h1 { font-size: 1rem; margin: 0; letter-spacing: 2px; font-weight: 800; }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
 
         .btn {
             background: #3a3a3c;
-            border: none;
+            border: 1px solid #565758;
             color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-weight: bold;
-            font-size: 0.6rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .btn.active {
+            background: var(--correct);
+            border-color: var(--correct);
         }
 
         #game-view {
@@ -72,13 +86,14 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
+            padding: 5px 0;
         }
 
         #board-container {
             width: 100%;
             height: 100%;
             display: flex;
-            transition: transform 0.3s ease-out;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .screen-wrapper {
@@ -87,35 +102,42 @@
             height: 100%;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 5px;
-            padding: 5px;
-            align-items: start;
+            gap: 12px;
+            padding: 0 10px;
+            align-items: center;
         }
 
         .board {
             display: grid;
             grid-template-rows: repeat(13, 1fr);
-            gap: 2px;
+            gap: 3px;
             width: 100%;
             height: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+            padding: 4px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background: #1a1a1b;
         }
 
         .row {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 2px;
+            gap: 3px;
         }
 
         .tile {
             aspect-ratio: 1;
-            border: 1px solid var(--border);
+            border: 1.5px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: calc(var(--tile-size) * 0.5);
-            font-weight: bold;
+            font-size: calc(var(--tile-size) * 0.55);
+            font-weight: 700;
             text-transform: uppercase;
             user-select: none;
+            border-radius: 2px;
         }
 
         .tile[data-state="correct"] { background-color: var(--correct); border-color: var(--correct); }
@@ -124,55 +146,55 @@
         .tile[data-state="tbd"] { border-color: #565758; }
 
         #nav-indicators {
-            height: 15px;
+            height: 25px;
             display: flex;
-            gap: 6px;
+            gap: 12px;
             justify-content: center;
             align-items: center;
-            background: var(--bg);
             flex-shrink: 0;
         }
 
         .dot {
-            width: 5px;
-            height: 5px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: #444;
+            background: #3a3a3c;
+            transition: all 0.2s;
         }
 
-        .dot.active { background: #fff; }
+        .dot.active { background: #fff; transform: scale(1.2); }
         .dot.solved { background: var(--correct); }
 
         #input-area {
             flex-shrink: 0;
             background: var(--bg);
             border-top: 1px solid var(--border);
-            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .status-tray {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
-            gap: 2px;
-            padding: 4px;
-            max-width: 400px;
+            gap: 4px;
+            padding: 8px;
+            max-width: 450px;
             margin: 0 auto;
         }
 
         .key-hint {
-            height: 28px;
-            border-radius: 3px;
+            height: 34px;
+            border-radius: 4px;
             background: #818384;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             font-weight: bold;
+            transition: background 0.1s;
         }
 
         .key-hint[data-state="correct"] { background-color: var(--correct); }
         .key-hint[data-state="present"] { background-color: var(--present); }
-        .key-hint[data-state="absent"] { background-color: var(--absent); opacity: 0.3; }
+        .key-hint[data-state="absent"] { background-color: var(--absent); opacity: 0.4; }
 
         #hidden-input {
             position: absolute;
@@ -183,46 +205,52 @@
 
         #mobile-trigger {
             width: 100%;
-            height: 30px;
+            height: 20px;
             background: transparent;
             border: none;
-            color: #444;
+            color: #333;
             font-size: 0.6rem;
+            font-weight: bold;
+            text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         #message {
             position: fixed;
-            top: 15%;
+            top: 20%;
             left: 50%;
             transform: translateX(-50%);
             background: white;
             color: black;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-weight: bold;
             z-index: 1000;
             display: none;
-            font-size: 0.8rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
     </style>
 </head>
 <body onclick="focusInput()">
 
     <header>
-        <h1 id="mode-title">OCTORDLE</h1>
-        <div style="display: flex; gap: 8px; align-items: center;">
-            <span id="board-count" style="font-size: 0.6rem; color: #888;">1-2/8</span>
-            <button class="btn" onclick="startNewGame()">NEW</button>
+        <div class="header-top">
+            <h1 id="mode-title">DAILY OCTORDLE</h1>
+            <div class="header-controls">
+                <span id="board-count" style="font-size: 0.7rem; color: #888; font-weight: bold;">1-2/8</span>
+                <button class="btn" id="btn-daily" onclick="startDaily()">DAILY</button>
+                <button class="btn" id="btn-new" onclick="startNewGame()">NEW</button>
+            </div>
         </div>
     </header>
 
     <div id="game-view">
         <div id="board-container">
-            <!-- 4 Screens (2 boards each) will be generated here -->
+            <!-- 4 Screens -->
         </div>
-        <div id="nav-indicators"></div>
     </div>
+
+    <div id="nav-indicators"></div>
 
     <div id="message"></div>
 
@@ -237,14 +265,15 @@
         let ALLOWED = [];
         let targetWords = [];
         let boardStates = [];
-        let currentScreenIdx = 0; // 0 to 3
+        let currentScreenIdx = 0;
         let currentGuess = "";
         let globalGuessCount = 0;
         let isDaily = true;
+        let dailySeed = 0;
+        
         let touchStartX = 0;
         let touchEndX = 0;
 
-        // Load word lists
         async function loadWords() {
             try {
                 const [solRes, allowRes] = await Promise.all([
@@ -256,15 +285,12 @@
                 
                 SOLUTIONS = solTxt.split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
                 ALLOWED = allowTxt.split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
-                
-                // Add solutions to allowed list just in case
                 ALLOWED = Array.from(new Set([...ALLOWED, ...SOLUTIONS]));
                 
                 startDaily();
             } catch (err) {
                 console.error("Failed to load dictionaries", err);
-                // Fallback to a tiny list so it's playable
-                SOLUTIONS = ["APPLE", "BEACH", "BRAIN"];
+                SOLUTIONS = ["APPLE", "BEACH", "BRAIN", "BREAD", "BRUSH", "CHAIR", "CHEST", "CHORD"];
                 ALLOWED = SOLUTIONS;
                 startDaily();
             }
@@ -279,7 +305,7 @@
             }
         }
 
-        function init(seed) {
+        function init(seed, loadingSaved = false) {
             targetWords = [];
             boardStates = [];
             currentGuess = "";
@@ -298,17 +324,14 @@
                 boardStates.push({ guesses: [], solved: false });
             }
 
-            // Create 4 Screens
             for (let s = 0; s < 4; s++) {
                 const screen = document.createElement('div');
                 screen.className = 'screen-wrapper';
-                
                 for (let b = 0; b < 2; b++) {
                     const boardIdx = s * 2 + b;
                     const board = document.createElement('div');
                     board.className = 'board';
                     board.id = `board-${boardIdx}`;
-                    
                     for (let r = 0; r < 13; r++) {
                         const row = document.createElement('div');
                         row.className = 'row';
@@ -327,6 +350,10 @@
                 dot.className = 'dot';
                 dot.id = `dot-${s}`;
                 indicators.appendChild(dot);
+            }
+
+            if (isDaily && !loadingSaved) {
+                loadGameState();
             }
 
             initTray();
@@ -348,17 +375,15 @@
         }
 
         function resizeGame() {
-            // Use Visual Viewport to handle keyboard
-            const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-            document.documentElement.style.setProperty('--vh', `${vh / 100}px`);
+            const viewportH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            const headerH = document.querySelector('header').offsetHeight;
+            const inputH = document.getElementById('input-area').offsetHeight;
+            const navH = document.getElementById('nav-indicators').offsetHeight;
             
-            const headerH = 40;
-            const trayH = 80; // Status tray + trigger
-            const navH = 15;
-            const availableH = vh - headerH - trayH - navH - 10; // 10 for margin/padding
+            const availableH = viewportH - headerH - inputH - navH - 20; // 20px padding/margin
             
-            // Calculate tile size. 13 rows + gaps.
-            const tileSize = Math.floor(availableH / 14); // 13 rows + some buffer
+            // Calculate tile size so 13 rows fit. 13 rows + gaps.
+            const tileSize = Math.floor(availableH / 14); // Using 14 to provide some safe buffer
             document.documentElement.style.setProperty('--tile-size', `${tileSize}px`);
         }
 
@@ -368,9 +393,11 @@
         function updateUI() {
             const container = document.getElementById('board-container');
             container.style.transform = `translateX(-${currentScreenIdx * 100}%)`;
-            
             document.getElementById('board-count').innerText = `${currentScreenIdx * 2 + 1}-${currentScreenIdx * 2 + 2}/8`;
             document.getElementById('mode-title').innerText = isDaily ? "DAILY OCTORDLE" : "PRACTICE OCTORDLE";
+            
+            document.getElementById('btn-daily').classList.toggle('active', isDaily);
+            document.getElementById('btn-new').classList.toggle('active', !isDaily);
 
             for (let s = 0; s < 4; s++) {
                 const dot = document.getElementById(`dot-${s}`);
@@ -389,7 +416,7 @@
         }
 
         const input = document.getElementById('hidden-input');
-        input.addEventListener('input', (e) => {
+        input.addEventListener('input', () => {
             currentGuess = input.value.toUpperCase();
             updateVisuals();
         });
@@ -398,12 +425,12 @@
             if (e.key === 'Enter') {
                 if (currentGuess.length === 5) {
                     if (!ALLOWED.includes(currentGuess)) {
-                        showMessage("Invalid word");
+                        showMessage("INVALID WORD");
                         return;
                     }
                     submitGuess();
                 } else {
-                    showMessage("Too short");
+                    showMessage("TOO SHORT");
                 }
             }
         });
@@ -424,10 +451,15 @@
             globalGuessCount++;
             currentGuess = "";
             input.value = "";
+            
+            if (isDaily) saveGameState();
             updateUI();
 
             if (allSolved) showMessage("🏆 YOU WON!");
-            else if (globalGuessCount >= 13) showMessage("GAME OVER: " + targetWords.join(", "));
+            else if (globalGuessCount >= 13) {
+                showMessage("GAME OVER");
+                // Reveal words in console or alert if needed
+            }
         }
 
         function updateVisuals() {
@@ -513,26 +545,53 @@
             setTimeout(() => m.style.display = 'none', 3000);
         }
 
-        document.getElementById('game-view').addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
-        document.getElementById('game-view').addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, false);
         function handleSwipe() {
             const diff = touchStartX - touchEndX;
-            if (Math.abs(diff) > 50) {
+            if (Math.abs(diff) > 40) {
                 if (diff > 0 && currentScreenIdx < 3) currentScreenIdx++;
                 else if (diff < 0 && currentScreenIdx > 0) currentScreenIdx--;
                 updateUI();
             }
         }
 
+        document.getElementById('game-view').addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
+        document.getElementById('game-view').addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, false);
+
+        function saveGameState() {
+            const state = {
+                seed: dailySeed,
+                guesses: boardStates.map(b => b.guesses),
+                count: globalGuessCount
+            };
+            localStorage.setItem('octordle_daily_state', JSON.stringify(state));
+        }
+
+        function loadGameState() {
+            const saved = localStorage.getItem('octordle_daily_state');
+            if (saved) {
+                const state = JSON.parse(saved);
+                if (state.seed === dailySeed) {
+                    globalGuessCount = state.count;
+                    for (let i = 0; i < 8; i++) {
+                        boardStates[i].guesses = state.guesses[i];
+                        if (boardStates[i].guesses.includes(targetWords[i])) {
+                            boardStates[i].solved = true;
+                        }
+                    }
+                }
+            }
+        }
+
         function startDaily() {
             isDaily = true;
             const today = new Date();
-            init(today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate());
+            dailySeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+            init(dailySeed);
         }
 
         function startNewGame() {
             isDaily = false;
-            init(Math.floor(Math.random() * 1000000));
+            init(Math.floor(Math.random() * 1000000), true);
         }
 
         loadWords();
