@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Octordle Pro</title>
+    <title>Octordle Pro v4</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
@@ -15,11 +15,11 @@
             --absent: #3a3a3c;
             --invalid: #e12d2d;
             --border: #3a3a3c;
-            /* Precise dimensions for 430x546 open viewport */
-            --header-h: 45px;
-            --nav-h: 20px;
-            --tray-h: 80px;
-            --row-h: 25px; /* 13 rows * 25px = 325px. Total = 470px. well within 546px. */
+            /* Hard-coded for iPhone 14/15 Pro safe areas */
+            --header-h: 40px;
+            --nav-h: 15px;
+            --dock-h: 75px;
+            --row-h: 22px; /* Ultra-compact to fit above the Accessory Bar */
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: none; }
         body {
@@ -32,17 +32,18 @@
             overflow: hidden; position: fixed;
             top: 0; left: 0;
         }
+        #safe-top { height: 44px; flex-shrink: 0; background: var(--bg); } /* Clears Dynamic Island */
         header {
             height: var(--header-h); flex-shrink: 0;
             background: #1a1a1b; border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 10px; padding-top: 5px; /* Manual offset for notch */
+            padding: 0 10px;
         }
         header h1 { font-size: 0.8rem; margin: 0; font-weight: 800; letter-spacing: 1px; }
         .btn-row { display: flex; gap: 5px; }
         .btn { 
             background: #3a3a3c; border: 1px solid #555; color: white; 
-            padding: 3px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; 
+            padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; 
         }
         .btn.active { background: var(--correct); border-color: var(--correct); }
 
@@ -56,18 +57,17 @@
         .screen-pair {
             flex-shrink: 0; width: 100%; height: 100%;
             display: grid; grid-template-columns: 1fr 1fr;
-            gap: 8px; padding: 5px 8px; align-items: start;
+            gap: 6px; padding: 4px 6px; align-items: start;
         }
         .board-box {
-            background: #1a1a1b; border: 1px solid #333; border-radius: 4px; padding: 2px;
-            display: flex; flex-direction: column;
+            background: #1a1a1b; border: 1px solid #333; border-radius: 4px; padding: 1px;
         }
         .grid { display: grid; grid-template-rows: repeat(13, var(--row-h)); gap: 1px; }
         .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; height: var(--row-h); }
         .tile {
             border: 1px solid var(--border);
             display: flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: bold; text-transform: uppercase;
+            font-size: 11px; font-weight: 800; text-transform: uppercase;
             background: var(--bg);
         }
         .tile[data-state="correct"] { background-color: var(--correct); border-color: var(--correct); }
@@ -80,37 +80,37 @@
             height: var(--nav-h); display: flex; gap: 8px; align-items: center; justify-content: center;
             background: var(--bg); flex-shrink: 0;
         }
-        .dot { width: 5px; height: 5px; border-radius: 50%; background: #3a3a3c; }
-        .dot.active { background: #fff; }
-        .dot.solved { background: var(--correct); }
+        .dot { width: 4px; height: 4px; border-radius: 50%; background: #333; }
+        .dot.active { background: #fff; transform: scale(1.2); }
 
         #dock {
-            height: var(--tray-h); flex-shrink: 0;
+            height: var(--dock-h); flex-shrink: 0;
             background: var(--bg); border-top: 1px solid var(--border);
+            padding-bottom: 5px; /* Extra buffer above accessory bar */
         }
         .keymap {
-            display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px;
-            padding: 3px; max-width: 430px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(10, 1fr); gap: 1px;
+            padding: 2px; max-width: 430px; margin: 0 auto;
         }
         .key {
-            height: 30px; border-radius: 3px; background: #818384;
+            height: 28px; border-radius: 3px; background: #818384;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.75rem; font-weight: bold;
+            font-size: 0.7rem; font-weight: bold;
         }
         .key[data-state="correct"] { background-color: var(--correct); }
         .key[data-state="present"] { background-color: var(--present); }
         .key[data-state="absent"] { background-color: var(--absent); opacity: 0.3; }
 
         #hidden-input { position: absolute; opacity: 0; pointer-events: none; left: -9999px; }
-        #keyboard-btn { width: 100%; height: 15px; background: transparent; border: none; color: #333; font-size: 7px; }
         #message {
-            position: fixed; top: 10%; left: 50%; transform: translateX(-50%);
-            background: white; color: black; padding: 8px 15px; border-radius: 4px;
-            font-weight: bold; z-index: 9999; display: none; font-size: 0.7rem;
+            position: fixed; top: 12%; left: 50%; transform: translateX(-50%);
+            background: white; color: black; padding: 6px 12px; border-radius: 4px;
+            font-weight: bold; z-index: 9999; display: none; font-size: 0.65rem;
         }
     </style>
 </head>
 <body onclick="focusInput()">
+    <div id="safe-top"></div> <!-- Clears status icons/Dynamic Island -->
     <header>
         <h1 id="mode-label">DAILY OCTORDLE</h1>
         <div class="btn-row">
@@ -127,7 +127,6 @@
 
     <div id="dock">
         <div class="keymap" id="keymap"></div>
-        <button id="keyboard-btn">FOCUS</button>
         <input type="text" id="hidden-input" maxlength="5" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text">
     </div>
 
@@ -261,7 +260,7 @@
             const v = window.visualViewport;
             document.body.style.height = v.height + "px";
             document.body.style.top = v.offsetTop + "px";
-            window.scrollTo(0, 0); // Force scroll lock
+            window.scrollTo(0, 0);
         }
         window.visualViewport.addEventListener('resize', updateViewport);
         window.visualViewport.addEventListener('scroll', updateViewport);
@@ -272,9 +271,9 @@
         document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
         document.addEventListener('touchend', e => { const diff = touchStartX - e.changedTouches[0].screenX; if(Math.abs(diff) > 40) { if(diff > 0 && currentScreenIdx < 3) currentScreenIdx++; else if(diff < 0 && currentScreenIdx > 0) currentScreenIdx--; updateUI(); } }, false);
 
-        function saveState() { localStorage.setItem('octordle_final_state', JSON.stringify({ seed: dailySeed, guesses: boardStates.map(b => b.guesses), count: globalGuessCount })); }
+        function saveState() { localStorage.setItem('octordle_v4_save', JSON.stringify({ seed: dailySeed, guesses: boardStates.map(b => b.guesses), count: globalGuessCount })); }
         function loadState() {
-            const saved = localStorage.getItem('octordle_final_state');
+            const saved = localStorage.getItem('octordle_v4_save');
             if(saved) {
                 const s = JSON.parse(saved);
                 if(s.seed === dailySeed) {
