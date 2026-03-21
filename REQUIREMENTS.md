@@ -6,36 +6,32 @@ A refined, single-file HTML5 application that implements an "Octordle" (8-word W
 ## 2. Core Game Logic
 - **Objective:** Simultaneously solve 8 different 5-letter words in 13 total guesses.
 - **Game Modes:**
-  - **Daily Mode:** The 8 words are deterministic based on the current date. Progress (guesses made) is saved to `localStorage` so the game can be resumed throughout the day.
-  - **Practice Mode:** A "NEW" button generates 8 completely random words for infinite play. Practice progress is not persisted.
-- **Dictionary:**
-  - **Solutions:** 2,315 common 5-letter words (from `shuffled_real_wordles.txt`).
-  - **Allowed Guesses:** ~12,000 valid 5-letter words (from `official_allowed_guesses.txt`).
+  - **Daily Mode:** The 8 words are deterministic based on the current date. Progress (guesses made) is saved to `localStorage`.
+  - **Practice Mode:** A "NEW" button generates 8 completely random words.
+- **Validation:** 
+  - If an entered word is not in the dictionary, the row should briefly flash or be highlighted in **RED** to indicate an invalid entry.
 
-## 3. Visual Layout & Responsive Design
-- **Zero Scrolling:** The application must fit perfectly within the visible viewport at all times. Vertical scrolling is disabled.
-- **Header:** A dedicated top section with ample padding for the "DAILY OCTORDLE" title, game mode indicators (e.g., "1-2/8"), and action buttons ("NEW" and "DAILY").
-- **Dual-Board View:** Two boards are displayed side-by-side on each screen.
-  - **Board Separation:** Distinct visual gap and subtle border/outline between the two active boards.
-  - **Square Tiles:** Tiles must maintain a 1:1 aspect ratio regardless of scaling.
-- **Adaptive Scaling:** The entire game grid (13 rows) must dynamically resize its height to remain fully visible when the iOS keyboard is toggled. No part of the grid should be obscured by the keyboard or UI chrome.
+## 3. Visual Layout & Scaling (Critical)
+- **Zero Scrolling:** The application must fit perfectly within the visible viewport at all times. Vertical scrolling is strictly disabled.
+- **Aspect Ratio Locking:** All board tiles MUST maintain a perfect 1:1 square aspect ratio.
+- **Active Board Scaling:**
+  - When the native iOS keyboard is visible, the entire game grid (all 13 rows) must automatically scale down in size so that the top of the board is below the header and the bottom of the board is above the Status Tray.
+  - The board container (grey shaded area) must encompass the tiles perfectly without overflow.
+- **Board Separation:** Distinct 15px-20px gap and subtle border/outline between the two active boards on a single screen.
 
 ## 4. iOS & Keyboard Optimization
-- **Persistent Native Keyboard:** A hidden input field remains focused to keep the native keyboard open during play.
+- **Auto-Focus:** The native keyboard should attempt to open automatically upon page load or when starting a new game.
 - **Status Tray (Letter Map):**
   - A compact alphabet map sitting directly above the native keyboard.
-  - **Tight Alignment:** The tray must be positioned to eliminate "dead space" between the alphabet and the top of the native keyboard.
-  - **Dynamic Context:** Shows color-coded letter status for the currently visible pair of boards.
-- **Navigation:** Horizontal swipe gestures to switch between the 4 pairs of boards (8 words total).
+  - No "dead space" between the tray and the native keyboard.
+- **Navigation:** Horizontal swipe gestures to switch between the 4 pairs of boards.
 
 ## 5. Technical Implementation
-- **Data Persistence:** Use `localStorage` to store the daily seed and current guess history.
-- **Visual Viewport API:** Leverage `window.visualViewport` to accurately calculate the available screen height in real-time.
-- **Multi-File Fetch:** Use the `fetch` API for external word lists.
-- **Single index.html:** All logic, styling, and framework in one file.
+- **Visual Viewport API:** Use `window.visualViewport` to dynamically calculate `availableHeight` and set tile sizes in pixels to ensure a perfect fit.
+- **localStorage:** Persist daily game state.
+- **Fetch API:** Load external word lists.
 
 ## 6. Success Criteria
-- All 13 guess rows are visible on an iPhone screen simultaneously.
-- Swiping is smooth and correctly updates the letter map status.
-- Daily progress remains intact after closing and reopening the browser.
-- The UI feels "airy" and professional, avoiding the cramped or stretched appearance of earlier versions.
+- All 13 rows of the dual-board view are fully visible simultaneously on an iPhone, both with and without the keyboard open.
+- Tiles never overflow their containers or overlap other boards.
+- Invalid words are clearly indicated with a red highlight.

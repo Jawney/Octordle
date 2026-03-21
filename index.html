@@ -20,6 +20,7 @@
             --correct: #538d4e;
             --present: #b59f3b;
             --absent: #3a3a3c;
+            --invalid: #e12d2d;
             --border: #3a3a3c;
             --empty: #121213;
             --tile-size: 20px;
@@ -43,7 +44,7 @@
         }
 
         header {
-            padding: 15px 15px 5px 15px;
+            padding: 10px 10px 5px 10px;
             flex-shrink: 0;
             background: var(--bg);
             padding-top: calc(10px + env(safe-area-inset-top));
@@ -53,14 +54,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
-        header h1 { font-size: 1rem; margin: 0; letter-spacing: 2px; font-weight: 800; }
+        header h1 { font-size: 0.9rem; margin: 0; letter-spacing: 1px; font-weight: 800; }
 
         .header-controls {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
 
@@ -68,10 +69,10 @@
             background: #3a3a3c;
             border: 1px solid #565758;
             color: white;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
         }
 
@@ -86,7 +87,6 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
-            padding: 5px 0;
         }
 
         #board-container {
@@ -100,96 +100,97 @@
             flex-shrink: 0;
             width: 100%;
             height: 100%;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            padding: 0 10px;
+            display: flex;
+            justify-content: center;
             align-items: center;
+            padding: 0 10px;
+            gap: 15px; /* Spacing between boards */
         }
 
         .board {
             display: grid;
             grid-template-rows: repeat(13, 1fr);
-            gap: 3px;
-            width: 100%;
-            height: 100%;
-            max-width: 200px;
-            margin: 0 auto;
+            gap: 2px;
             padding: 4px;
             border: 1px solid #333;
             border-radius: 4px;
             background: #1a1a1b;
+            height: fit-content;
+            width: fit-content;
         }
 
         .row {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 3px;
+            gap: 2px;
         }
 
         .tile {
-            aspect-ratio: 1;
+            width: var(--tile-size);
+            height: var(--tile-size);
             border: 1.5px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: calc(var(--tile-size) * 0.55);
+            font-size: calc(var(--tile-size) * 0.5);
             font-weight: 700;
             text-transform: uppercase;
             user-select: none;
             border-radius: 2px;
+            transition: background-color 0.2s, border-color 0.2s;
         }
 
         .tile[data-state="correct"] { background-color: var(--correct); border-color: var(--correct); }
         .tile[data-state="present"] { background-color: var(--present); border-color: var(--present); }
         .tile[data-state="absent"] { background-color: var(--absent); border-color: var(--absent); }
         .tile[data-state="tbd"] { border-color: #565758; }
+        .row.invalid .tile[data-state="tbd"] { border-color: var(--invalid); color: var(--invalid); }
 
         #nav-indicators {
-            height: 25px;
+            height: 20px;
             display: flex;
             gap: 12px;
             justify-content: center;
             align-items: center;
             flex-shrink: 0;
+            background: var(--bg);
         }
 
         .dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #3a3a3c;
-            transition: all 0.2s;
         }
 
-        .dot.active { background: #fff; transform: scale(1.2); }
+        .dot.active { background: #fff; transform: scale(1.1); }
         .dot.solved { background: var(--correct); }
 
         #input-area {
             flex-shrink: 0;
             background: var(--bg);
             border-top: 1px solid var(--border);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .status-tray {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
-            gap: 4px;
-            padding: 8px;
-            max-width: 450px;
+            gap: 3px;
+            padding: 6px;
+            max-width: 400px;
             margin: 0 auto;
         }
 
         .key-hint {
-            height: 34px;
+            height: 30px;
             border-radius: 4px;
             background: #818384;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: bold;
-            transition: background 0.1s;
         }
 
         .key-hint[data-state="correct"] { background-color: var(--correct); }
@@ -205,7 +206,7 @@
 
         #mobile-trigger {
             width: 100%;
-            height: 20px;
+            height: 25px;
             background: transparent;
             border: none;
             color: #333;
@@ -222,12 +223,13 @@
             transform: translateX(-50%);
             background: white;
             color: black;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 8px 16px;
+            border-radius: 4px;
             font-weight: bold;
             z-index: 1000;
             display: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            font-size: 0.8rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
     </style>
 </head>
@@ -237,7 +239,7 @@
         <div class="header-top">
             <h1 id="mode-title">DAILY OCTORDLE</h1>
             <div class="header-controls">
-                <span id="board-count" style="font-size: 0.7rem; color: #888; font-weight: bold;">1-2/8</span>
+                <span id="board-count" style="font-size: 0.65rem; color: #888; font-weight: bold;">1-2/8</span>
                 <button class="btn" id="btn-daily" onclick="startDaily()">DAILY</button>
                 <button class="btn" id="btn-new" onclick="startNewGame()">NEW</button>
             </div>
@@ -246,18 +248,17 @@
 
     <div id="game-view">
         <div id="board-container">
-            <!-- 4 Screens -->
+            <!-- Screens generated here -->
         </div>
+        <div id="nav-indicators"></div>
     </div>
-
-    <div id="nav-indicators"></div>
 
     <div id="message"></div>
 
     <div id="input-area">
         <div class="status-tray" id="status-tray"></div>
-        <button id="mobile-trigger" onclick="focusInput(event)">Keyboard Link</button>
-        <input type="text" id="hidden-input" maxlength="5" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button id="mobile-trigger" onclick="focusInput(event)">Keyboard Focus</button>
+        <input type="text" id="hidden-input" maxlength="5" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text">
     </div>
 
     <script>
@@ -270,7 +271,6 @@
         let globalGuessCount = 0;
         let isDaily = true;
         let dailySeed = 0;
-        
         let touchStartX = 0;
         let touchEndX = 0;
 
@@ -280,13 +280,9 @@
                     fetch('shuffled_real_wordles.txt'),
                     fetch('official_allowed_guesses.txt')
                 ]);
-                const solTxt = await solRes.text();
-                const allowTxt = await allowRes.text();
-                
-                SOLUTIONS = solTxt.split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
-                ALLOWED = allowTxt.split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
+                SOLUTIONS = (await solRes.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
+                ALLOWED = (await allowRes.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
                 ALLOWED = Array.from(new Set([...ALLOWED, ...SOLUTIONS]));
-                
                 startDaily();
             } catch (err) {
                 console.error("Failed to load dictionaries", err);
@@ -335,6 +331,7 @@
                     for (let r = 0; r < 13; r++) {
                         const row = document.createElement('div');
                         row.className = 'row';
+                        row.id = `board-${boardIdx}-row-${r}`;
                         for (let c = 0; c < 5; c++) {
                             const tile = document.createElement('div');
                             tile.className = 'tile';
@@ -352,50 +349,38 @@
                 indicators.appendChild(dot);
             }
 
-            if (isDaily && !loadingSaved) {
-                loadGameState();
-            }
-
+            if (isDaily && !loadingSaved) loadGameState();
             initTray();
             resizeGame();
             updateUI();
-            focusInput();
-        }
-
-        function initTray() {
-            const tray = document.getElementById('status-tray');
-            tray.innerHTML = '';
-            "QWERTYUIOPASDFGHJKLZXCVBNM".split('').forEach(letter => {
-                const hint = document.createElement('div');
-                hint.className = 'key-hint';
-                hint.id = `hint-${letter}`;
-                hint.innerText = letter;
-                tray.appendChild(hint);
-            });
+            setTimeout(focusInput, 100);
         }
 
         function resizeGame() {
             const viewportH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            const viewportW = window.visualViewport ? window.visualViewport.width : window.innerWidth;
             const headerH = document.querySelector('header').offsetHeight;
-            const inputH = document.getElementById('input-area').offsetHeight;
+            const trayH = document.getElementById('input-area').offsetHeight;
             const navH = document.getElementById('nav-indicators').offsetHeight;
             
-            const availableH = viewportH - headerH - inputH - navH - 20; // 20px padding/margin
+            const availableH = viewportH - headerH - trayH - navH - 20; 
+            const availableW = viewportW - 40; // Total width for two boards + gaps
+
+            // Tile size restricted by BOTH height (13 rows) and width (2 boards * 5 tiles)
+            const tileSizeH = Math.floor(availableH / 13.5); // Fits 13 rows vertically
+            const tileSizeW = Math.floor(availableW / 11); // Fits 2 boards of 5 tiles + gap
             
-            // Calculate tile size so 13 rows fit. 13 rows + gaps.
-            const tileSize = Math.floor(availableH / 14); // Using 14 to provide some safe buffer
-            document.documentElement.style.setProperty('--tile-size', `${tileSize}px`);
+            const finalTileSize = Math.min(tileSizeH, tileSizeW);
+            document.documentElement.style.setProperty('--tile-size', `${finalTileSize}px`);
         }
 
         window.visualViewport?.addEventListener('resize', resizeGame);
-        window.visualViewport?.addEventListener('scroll', resizeGame);
 
         function updateUI() {
             const container = document.getElementById('board-container');
             container.style.transform = `translateX(-${currentScreenIdx * 100}%)`;
             document.getElementById('board-count').innerText = `${currentScreenIdx * 2 + 1}-${currentScreenIdx * 2 + 2}/8`;
             document.getElementById('mode-title').innerText = isDaily ? "DAILY OCTORDLE" : "PRACTICE OCTORDLE";
-            
             document.getElementById('btn-daily').classList.toggle('active', isDaily);
             document.getElementById('btn-new').classList.toggle('active', !isDaily);
 
@@ -405,19 +390,21 @@
                 if (s === currentScreenIdx) dot.classList.add('active');
                 if (boardStates[s*2].solved && boardStates[s*2+1].solved) dot.classList.add('solved');
             }
-
             updateVisuals();
             updateTrayHints();
         }
 
         function focusInput(e) {
             if (e) e.stopPropagation();
-            document.getElementById('hidden-input').focus();
+            const input = document.getElementById('hidden-input');
+            input.focus();
         }
 
         const input = document.getElementById('hidden-input');
         input.addEventListener('input', () => {
             currentGuess = input.value.toUpperCase();
+            // Clear any invalid states on input
+            document.querySelectorAll('.row.invalid').forEach(r => r.classList.remove('invalid'));
             updateVisuals();
         });
 
@@ -425,15 +412,24 @@
             if (e.key === 'Enter') {
                 if (currentGuess.length === 5) {
                     if (!ALLOWED.includes(currentGuess)) {
-                        showMessage("INVALID WORD");
+                        markInvalid();
                         return;
                     }
                     submitGuess();
-                } else {
-                    showMessage("TOO SHORT");
                 }
             }
         });
+
+        function markInvalid() {
+            const b1 = currentScreenIdx * 2;
+            const b2 = b1 + 1;
+            [b1, b2].forEach(idx => {
+                if (!boardStates[idx].solved) {
+                    document.getElementById(`board-${idx}-row-${globalGuessCount}`).classList.add('invalid');
+                }
+            });
+            showMessage("INVALID WORD");
+        }
 
         function submitGuess() {
             if (globalGuessCount >= 13) return;
@@ -451,15 +447,9 @@
             globalGuessCount++;
             currentGuess = "";
             input.value = "";
-            
             if (isDaily) saveGameState();
             updateUI();
-
             if (allSolved) showMessage("🏆 YOU WON!");
-            else if (globalGuessCount >= 13) {
-                showMessage("GAME OVER");
-                // Reveal words in console or alert if needed
-            }
         }
 
         function updateVisuals() {
@@ -467,7 +457,7 @@
                 const board = document.getElementById(`board-${i}`);
                 const state = boardStates[i];
                 for (let r = 0; r < 13; r++) {
-                    const row = board.children[r];
+                    const row = board.querySelectorAll('.row')[r];
                     const guess = state.guesses[r];
                     if (guess) {
                         const feedback = getFeedback(guess, targetWords[i]);
@@ -513,11 +503,22 @@
             return res;
         }
 
+        function initTray() {
+            const tray = document.getElementById('status-tray');
+            tray.innerHTML = '';
+            "QWERTYUIOPASDFGHJKLZXCVBNM".split('').forEach(letter => {
+                const hint = document.createElement('div');
+                hint.className = 'key-hint';
+                hint.id = `hint-${letter}`;
+                hint.innerText = letter;
+                tray.appendChild(hint);
+            });
+        }
+
         function updateTrayHints() {
             const b1 = currentScreenIdx * 2;
             const b2 = b1 + 1;
             const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM".split('');
-
             alphabet.forEach(letter => {
                 const hint = document.getElementById(`hint-${letter}`);
                 let status = "";
@@ -558,11 +559,7 @@
         document.getElementById('game-view').addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, false);
 
         function saveGameState() {
-            const state = {
-                seed: dailySeed,
-                guesses: boardStates.map(b => b.guesses),
-                count: globalGuessCount
-            };
+            const state = { seed: dailySeed, guesses: boardStates.map(b => b.guesses), count: globalGuessCount };
             localStorage.setItem('octordle_daily_state', JSON.stringify(state));
         }
 
@@ -573,10 +570,8 @@
                 if (state.seed === dailySeed) {
                     globalGuessCount = state.count;
                     for (let i = 0; i < 8; i++) {
-                        boardStates[i].guesses = state.guesses[i];
-                        if (boardStates[i].guesses.includes(targetWords[i])) {
-                            boardStates[i].solved = true;
-                        }
+                        boardStates[i].guesses = state.guesses[i] || [];
+                        if (boardStates[i].guesses.includes(targetWords[i])) boardStates[i].solved = true;
                     }
                 }
             }
