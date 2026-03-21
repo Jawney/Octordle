@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Octordle">
     
-    <!-- App Icon (8 in a square) -->
+    <!-- App Icon -->
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23121213'/><text x='50' y='65' font-family='Arial' font-size='60' fill='white' text-anchor='middle'>8</text></svg>">
 
     <style>
@@ -22,6 +22,8 @@
             --absent: #3a3a3c;
             --border: #3a3a3c;
             --empty: #121213;
+            --tile-size: 20px; /* Will be dynamically updated */
+            --vh: 1vh;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
@@ -32,7 +34,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
-            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -41,37 +43,35 @@
         }
 
         header {
-            height: 50px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 15px;
+            padding: 0 10px;
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
             background: var(--bg);
             padding-top: env(safe-area-inset-top);
         }
 
-        header h1 { font-size: 1.1rem; margin: 0; letter-spacing: 2px; }
+        header h1 { font-size: 0.9rem; margin: 0; letter-spacing: 1px; }
 
         .btn {
             background: #3a3a3c;
             border: none;
             color: white;
-            padding: 6px 10px;
+            padding: 4px 8px;
             border-radius: 4px;
             font-weight: bold;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
         }
 
         #game-view {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
             overflow: hidden;
+            position: relative;
         }
 
         #board-container {
@@ -81,40 +81,38 @@
             transition: transform 0.3s ease-out;
         }
 
-        .board-wrapper {
+        .screen-wrapper {
             flex-shrink: 0;
             width: 100%;
             height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            padding: 5px;
+            align-items: start;
         }
 
         .board {
             display: grid;
             grid-template-rows: repeat(13, 1fr);
-            gap: 4px;
+            gap: 2px;
             width: 100%;
-            max-width: 300px;
             height: 100%;
-            max-height: 600px;
         }
 
         .row {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 4px;
+            gap: 2px;
         }
 
         .tile {
             aspect-ratio: 1;
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: calc(var(--tile-size) * 0.5);
             font-weight: bold;
             text-transform: uppercase;
             user-select: none;
@@ -125,52 +123,50 @@
         .tile[data-state="absent"] { background-color: var(--absent); border-color: var(--absent); }
         .tile[data-state="tbd"] { border-color: #565758; }
 
-        /* Board Indicators */
         #nav-indicators {
-            height: 20px;
+            height: 15px;
             display: flex;
-            gap: 8px;
+            gap: 6px;
             justify-content: center;
             align-items: center;
-            margin-bottom: 5px;
+            background: var(--bg);
+            flex-shrink: 0;
         }
 
         .dot {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
             background: #444;
-            transition: background 0.3s;
         }
 
         .dot.active { background: #fff; }
         .dot.solved { background: var(--correct); }
 
-        /* Keyboard / Status Tray */
         #input-area {
             flex-shrink: 0;
-            padding-bottom: env(safe-area-inset-bottom);
             background: var(--bg);
             border-top: 1px solid var(--border);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .status-tray {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
-            gap: 3px;
-            padding: 8px;
-            max-width: 500px;
+            gap: 2px;
+            padding: 4px;
+            max-width: 400px;
             margin: 0 auto;
         }
 
         .key-hint {
-            height: 32px;
-            border-radius: 4px;
+            height: 28px;
+            border-radius: 3px;
             background: #818384;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             font-weight: bold;
         }
 
@@ -187,27 +183,27 @@
 
         #mobile-trigger {
             width: 100%;
-            height: 40px;
+            height: 30px;
             background: transparent;
             border: none;
-            color: #555;
-            font-size: 0.7rem;
-            text-transform: uppercase;
+            color: #444;
+            font-size: 0.6rem;
             letter-spacing: 1px;
         }
 
         #message {
             position: fixed;
-            top: 20%;
+            top: 15%;
             left: 50%;
             transform: translateX(-50%);
             background: white;
             color: black;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 8px 16px;
+            border-radius: 4px;
             font-weight: bold;
             z-index: 1000;
             display: none;
+            font-size: 0.8rem;
         }
     </style>
 </head>
@@ -215,39 +211,64 @@
 
     <header>
         <h1 id="mode-title">OCTORDLE</h1>
-        <div style="display: flex; gap: 8px;">
-            <span id="board-count" style="font-size: 0.7rem; color: #888;">1/8</span>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <span id="board-count" style="font-size: 0.6rem; color: #888;">1-2/8</span>
             <button class="btn" onclick="startNewGame()">NEW</button>
         </div>
     </header>
 
     <div id="game-view">
         <div id="board-container">
-            <!-- 8 Boards will be generated here -->
+            <!-- 4 Screens (2 boards each) will be generated here -->
         </div>
-        
-        <div id="nav-indicators">
-            <!-- 8 Dots will be generated here -->
-        </div>
+        <div id="nav-indicators"></div>
     </div>
 
     <div id="message"></div>
 
     <div id="input-area">
-        <div class="status-tray" id="status-tray">
-            <!-- Alphabet hints -->
-        </div>
-        <button id="mobile-trigger" onclick="focusInput(event)">Tap here if keyboard closes</button>
+        <div class="status-tray" id="status-tray"></div>
+        <button id="mobile-trigger" onclick="focusInput(event)">Keyboard Link</button>
         <input type="text" id="hidden-input" maxlength="5" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
 
     <script>
-        // Use a compact representation for the word list
-        const SOLUTIONS_STR = "cigarrebutsissyhumphawakeblushfocalevadenavalserveheathdwarfmodelkarmastinkgradequietbenchabatefeignmajordeathfreshcruststoolcolonabasemarryreactbattyprideflosshelixcroakstaffpaperunfedwhelptrawloutdoadobecrazysowerrepaydigitcratecluckspikecourtrevelfloatalongpointstareconicrearmpygmyawaititchypaddyfeastshirkreadyshareagainprowlrovergirthglazelightcruelabackenjoyridgesnarlafirepaganlessershoreunitesharkchasmlipidgullychalkfloutadeptassetagorashakestonymediamottoutterbleedconchretrotinyready"; // ... abbreviated for brevity, but I will include more logic below
-        
-        // I will dynamically fetch or provide a larger set in the final version
-        // For now, let's assume a reasonably sized list for the prototype
-        const ALL_WORDS = ["CIGAR", "REBUT", "SISSY", "HUMPH", "AWAKE", "BLUSH", "FOCAL", "EVADE", "NAVAL", "SERVE", "HEATH", "DWARF", "MODEL", "KARMA", "STINK", "GRADE", "QUIET", "BENCH", "ABATE", "FEIGN", "MAJOR", "DEATH", "FRESH", "CRUST", "STOOL", "COLON", "ABASE", "MARRY", "REACT", "BATTY", "PRIDE", "FLOSS", "HELIX", "CROAK", "STAFF", "PAPER", "UNFED", "WHELP", "TRAWL", "OUTDO", "ADOBE", "CRAZY", "SOWER", "REPAY", "DIGIT", "CRATE", "CLUCK", "SPIKE", "COURT", "REVEL", "FLOAT", "ALONG", "POINT", "STARE", "CONIC", "REARM", "PYGMY", "AWAIT", "ITCHY", "PADDY", "FEAST", "SHIRK", "READY", "SHARE", "AGAIN", "PROWL", "ROVER", "GIRTH", "GLAZE", "LIGHT", "CRUEL", "ABACK", "ENJOY", "RIDGE", "SNARL", "AFIRE", "PAGAN", "LESSER", "SHORE", "UNITE", "SHARK", "CHASM", "LIPID", "GULLY", "CHALK", "FLOUT", "ADEPT", "ASSET", "AGORA", "SHAKE", "STONY", "MEDIA", "MOTTO", "UTTER", "BLEED", "CONCH", "RETRO", "TINY", "APPLE", "BEACH", "BRAIN", "BREAD", "BRUSH", "CHAIR", "CHEST", "CHORD", "CLICK", "CLOCK", "CLOUD", "DANCE", "DIARY", "DRINK", "DRIVE", "EARTH", "FEAST", "FIELD", "FRUIT", "GLASS", "GRAPE", "GREEN", "GUESS", "HEART", "HOUSE", "JUICE", "LIGHT", "LEMON", "MELON", "MONEY", "MUSIC", "NIGHT", "OCEAN", "PARTY", "PIANO", "PILOT", "PLANE", "PHONE", "PIZZA", "PLANT", "RADIO", "RIVER", "ROBOT", "SHIRT", "SHOES", "SMILE", "SNAKE", "SPACE", "SPOON", "STORM", "TABLE", "TIGER", "TOAST", "TOUCH", "TRAIN", "TRUCK", "VOICE", "WATER", "WATCH", "WHALE", "WORLD", "WRITE", "YOUTH", "ZEBRA"];
+        let SOLUTIONS = [];
+        let ALLOWED = [];
+        let targetWords = [];
+        let boardStates = [];
+        let currentScreenIdx = 0; // 0 to 3
+        let currentGuess = "";
+        let globalGuessCount = 0;
+        let isDaily = true;
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        // Load word lists
+        async function loadWords() {
+            try {
+                const [solRes, allowRes] = await Promise.all([
+                    fetch('shuffled_real_wordles.txt'),
+                    fetch('official_allowed_guesses.txt')
+                ]);
+                const solTxt = await solRes.text();
+                const allowTxt = await allowRes.text();
+                
+                SOLUTIONS = solTxt.split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
+                ALLOWED = allowTxt.split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
+                
+                // Add solutions to allowed list just in case
+                ALLOWED = Array.from(new Set([...ALLOWED, ...SOLUTIONS]));
+                
+                startDaily();
+            } catch (err) {
+                console.error("Failed to load dictionaries", err);
+                // Fallback to a tiny list so it's playable
+                SOLUTIONS = ["APPLE", "BEACH", "BRAIN"];
+                ALLOWED = SOLUTIONS;
+                startDaily();
+            }
+        }
 
         function mulberry32(a) {
             return function() {
@@ -258,25 +279,12 @@
             }
         }
 
-        const NUM_BOARDS = 8;
-        const MAX_GUESSES = 13;
-        let targetWords = [];
-        let boardStates = [];
-        let currentBoardIdx = 0;
-        let currentGuess = "";
-        let globalGuessCount = 0;
-        let isDaily = true;
-
-        // Touch handling for swiping
-        let touchStartX = 0;
-        let touchEndX = 0;
-
         function init(seed) {
             targetWords = [];
             boardStates = [];
             currentGuess = "";
             globalGuessCount = 0;
-            currentBoardIdx = 0;
+            currentScreenIdx = 0;
             
             const rand = mulberry32(seed);
             const container = document.getElementById('board-container');
@@ -284,39 +292,45 @@
             container.innerHTML = '';
             indicators.innerHTML = '';
 
-            for (let i = 0; i < NUM_BOARDS; i++) {
-                const idx = Math.floor(rand() * ALL_WORDS.length);
-                targetWords.push(ALL_WORDS[idx].toUpperCase());
+            for (let i = 0; i < 8; i++) {
+                const idx = Math.floor(rand() * SOLUTIONS.length);
+                targetWords.push(SOLUTIONS[idx]);
                 boardStates.push({ guesses: [], solved: false });
+            }
 
-                // Create Board Wrapper
-                const wrapper = document.createElement('div');
-                wrapper.className = 'board-wrapper';
+            // Create 4 Screens
+            for (let s = 0; s < 4; s++) {
+                const screen = document.createElement('div');
+                screen.className = 'screen-wrapper';
                 
-                const board = document.createElement('div');
-                board.className = 'board';
-                
-                for (let r = 0; r < MAX_GUESSES; r++) {
-                    const row = document.createElement('div');
-                    row.className = 'row';
-                    for (let c = 0; c < 5; c++) {
-                        const tile = document.createElement('div');
-                        tile.className = 'tile';
-                        row.appendChild(tile);
+                for (let b = 0; b < 2; b++) {
+                    const boardIdx = s * 2 + b;
+                    const board = document.createElement('div');
+                    board.className = 'board';
+                    board.id = `board-${boardIdx}`;
+                    
+                    for (let r = 0; r < 13; r++) {
+                        const row = document.createElement('div');
+                        row.className = 'row';
+                        for (let c = 0; c < 5; c++) {
+                            const tile = document.createElement('div');
+                            tile.className = 'tile';
+                            row.appendChild(tile);
+                        }
+                        board.appendChild(row);
                     }
-                    board.appendChild(row);
+                    screen.appendChild(board);
                 }
-                wrapper.appendChild(board);
-                container.appendChild(wrapper);
+                container.appendChild(screen);
 
-                // Create Dot
                 const dot = document.createElement('div');
                 dot.className = 'dot';
-                dot.id = `dot-${i}`;
+                dot.id = `dot-${s}`;
                 indicators.appendChild(dot);
             }
 
             initTray();
+            resizeGame();
             updateUI();
             focusInput();
         }
@@ -333,19 +347,36 @@
             });
         }
 
+        function resizeGame() {
+            // Use Visual Viewport to handle keyboard
+            const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+            document.documentElement.style.setProperty('--vh', `${vh / 100}px`);
+            
+            const headerH = 40;
+            const trayH = 80; // Status tray + trigger
+            const navH = 15;
+            const availableH = vh - headerH - trayH - navH - 10; // 10 for margin/padding
+            
+            // Calculate tile size. 13 rows + gaps.
+            const tileSize = Math.floor(availableH / 14); // 13 rows + some buffer
+            document.documentElement.style.setProperty('--tile-size', `${tileSize}px`);
+        }
+
+        window.visualViewport?.addEventListener('resize', resizeGame);
+        window.visualViewport?.addEventListener('scroll', resizeGame);
+
         function updateUI() {
             const container = document.getElementById('board-container');
-            container.style.transform = `translateX(-${currentBoardIdx * 100}%)`;
+            container.style.transform = `translateX(-${currentScreenIdx * 100}%)`;
             
-            document.getElementById('board-count').innerText = `${currentBoardIdx + 1}/8`;
+            document.getElementById('board-count').innerText = `${currentScreenIdx * 2 + 1}-${currentScreenIdx * 2 + 2}/8`;
             document.getElementById('mode-title').innerText = isDaily ? "DAILY OCTORDLE" : "PRACTICE OCTORDLE";
 
-            // Update dots
-            for (let i = 0; i < NUM_BOARDS; i++) {
-                const dot = document.getElementById(`dot-${i}`);
+            for (let s = 0; s < 4; s++) {
+                const dot = document.getElementById(`dot-${s}`);
                 dot.className = 'dot';
-                if (i === currentBoardIdx) dot.classList.add('active');
-                if (boardStates[i].solved) dot.classList.add('solved');
+                if (s === currentScreenIdx) dot.classList.add('active');
+                if (boardStates[s*2].solved && boardStates[s*2+1].solved) dot.classList.add('solved');
             }
 
             updateVisuals();
@@ -354,8 +385,7 @@
 
         function focusInput(e) {
             if (e) e.stopPropagation();
-            const input = document.getElementById('hidden-input');
-            input.focus();
+            document.getElementById('hidden-input').focus();
         }
 
         const input = document.getElementById('hidden-input');
@@ -367,8 +397,8 @@
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 if (currentGuess.length === 5) {
-                    if (!ALL_WORDS.includes(currentGuess)) {
-                        showMessage("Not in word list");
+                    if (!ALLOWED.includes(currentGuess)) {
+                        showMessage("Invalid word");
                         return;
                     }
                     submitGuess();
@@ -379,16 +409,14 @@
         });
 
         function submitGuess() {
-            if (globalGuessCount >= MAX_GUESSES) return;
+            if (globalGuessCount >= 13) return;
             const guess = currentGuess;
             let allSolved = true;
 
-            for (let i = 0; i < NUM_BOARDS; i++) {
+            for (let i = 0; i < 8; i++) {
                 if (!boardStates[i].solved) {
                     boardStates[i].guesses.push(guess);
-                    if (guess === targetWords[i]) {
-                        boardStates[i].solved = true;
-                    }
+                    if (guess === targetWords[i]) boardStates[i].solved = true;
                 }
                 if (!boardStates[i].solved) allSolved = false;
             }
@@ -396,24 +424,19 @@
             globalGuessCount++;
             currentGuess = "";
             input.value = "";
-            
             updateUI();
 
             if (allSolved) showMessage("🏆 YOU WON!");
-            else if (globalGuessCount >= MAX_GUESSES) showMessage("GAME OVER: " + targetWords.join(", "));
+            else if (globalGuessCount >= 13) showMessage("GAME OVER: " + targetWords.join(", "));
         }
 
         function updateVisuals() {
-            const wrappers = document.querySelectorAll('.board-wrapper');
-            wrappers.forEach((wrapper, i) => {
-                const board = wrapper.querySelector('.board');
+            for (let i = 0; i < 8; i++) {
+                const board = document.getElementById(`board-${i}`);
                 const state = boardStates[i];
-                
-                // Rows
-                for (let r = 0; r < MAX_GUESSES; r++) {
+                for (let r = 0; r < 13; r++) {
                     const row = board.children[r];
                     const guess = state.guesses[r];
-                    
                     if (guess) {
                         const feedback = getFeedback(guess, targetWords[i]);
                         for (let c = 0; c < 5; c++) {
@@ -435,48 +458,51 @@
                         }
                     }
                 }
-            });
+            }
         }
 
         function getFeedback(guess, target) {
-            const results = new Array(5).fill('absent');
+            const res = new Array(5).fill('absent');
             const targetArr = target.split('');
             const guessArr = guess.split('');
             for (let i = 0; i < 5; i++) {
                 if (guessArr[i] === targetArr[i]) {
-                    results[i] = 'correct';
+                    res[i] = 'correct';
                     targetArr[i] = null;
                     guessArr[i] = null;
                 }
             }
             for (let i = 0; i < 5; i++) {
                 if (guessArr[i] && targetArr.includes(guessArr[i])) {
-                    results[i] = 'present';
+                    res[i] = 'present';
                     targetArr[targetArr.indexOf(guessArr[i])] = null;
                 }
             }
-            return results;
+            return res;
         }
 
         function updateTrayHints() {
-            const target = targetWords[currentBoardIdx];
-            const guesses = boardStates[currentBoardIdx].guesses;
+            const b1 = currentScreenIdx * 2;
+            const b2 = b1 + 1;
             const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM".split('');
 
             alphabet.forEach(letter => {
                 const hint = document.getElementById(`hint-${letter}`);
-                let best = "";
-                guesses.forEach(g => {
-                    const feedback = getFeedback(g, target);
-                    for(let i=0; i<5; i++) {
-                        if (g[i] === letter) {
-                            if (feedback[i] === 'correct') best = 'correct';
-                            else if (feedback[i] === 'present' && best !== 'correct') best = 'present';
-                            else if (best === "") best = 'absent';
+                let status = "";
+                [b1, b2].forEach(idx => {
+                    const target = targetWords[idx];
+                    boardStates[idx].guesses.forEach(g => {
+                        const feedback = getFeedback(g, target);
+                        for (let i=0; i<5; i++) {
+                            if (g[i] === letter) {
+                                if (feedback[i] === 'correct') status = 'correct';
+                                else if (feedback[i] === 'present' && status !== 'correct') status = 'present';
+                                else if (status === "") status = 'absent';
+                            }
                         }
-                    }
+                    });
                 });
-                hint.setAttribute('data-state', best);
+                hint.setAttribute('data-state', status);
             });
         }
 
@@ -487,21 +513,13 @@
             setTimeout(() => m.style.display = 'none', 3000);
         }
 
-        // Swipe Detection
-        document.getElementById('game-view').addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, false);
-
-        document.getElementById('game-view').addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, false);
-
+        document.getElementById('game-view').addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
+        document.getElementById('game-view').addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, false);
         function handleSwipe() {
             const diff = touchStartX - touchEndX;
             if (Math.abs(diff) > 50) {
-                if (diff > 0 && currentBoardIdx < NUM_BOARDS - 1) currentBoardIdx++;
-                else if (diff < 0 && currentBoardIdx > 0) currentBoardIdx--;
+                if (diff > 0 && currentScreenIdx < 3) currentScreenIdx++;
+                else if (diff < 0 && currentScreenIdx > 0) currentScreenIdx--;
                 updateUI();
             }
         }
@@ -509,8 +527,7 @@
         function startDaily() {
             isDaily = true;
             const today = new Date();
-            const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-            init(seed);
+            init(today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate());
         }
 
         function startNewGame() {
@@ -518,7 +535,7 @@
             init(Math.floor(Math.random() * 1000000));
         }
 
-        startDaily();
+        loadWords();
     </script>
 </body>
 </html>

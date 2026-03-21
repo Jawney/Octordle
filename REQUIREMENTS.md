@@ -10,40 +10,34 @@ A self-contained, single-file HTML5 application that implements an "Octordle" (8
   - **Practice Mode:** A button that generates 8 completely random words.
 - **Guesses:** 13 total guesses (shared across all 8 boards).
 - **Dictionary:**
-  - **Solutions:** 2,315 common 5-letter words (standard Wordle set).
-  - **Allowed Guesses:** ~12,000 valid 5-letter words to prevent "Not in word list" errors.
+  - **Solutions:** 2,315 common 5-letter words (loaded from `shuffled_real_wordles.txt`).
+  - **Allowed Guesses:** ~12,000 valid 5-letter words (loaded from `official_allowed_guesses.txt`).
 
 ## 3. iOS & Home Screen Optimization
 - **Web App Manifest:** Meta tags for `apple-mobile-web-app-capable` and `apple-mobile-web-app-status-bar-style`.
 - **Full Screen:** Hide Safari chrome when launched from the Home Screen.
-- **Persistent Keyboard:**
-  - Use a hidden input field that stays focused to keep the native iOS keyboard open.
-  - "Tap to Type" overlay to re-trigger focus if lost.
-  - Disable native auto-correct, auto-capitalize, and spell-check.
+- **Visual Viewport Scaling:** 
+  - Dynamically resize the entire game area when the native iOS keyboard is visible.
+  - Use `window.visualViewport` API to calculate available height and scale tiles to fit without scrolling.
 
 ## 4. User Interface (UI) & Navigation
-- **Single-Board View:** To maximize vertical space, only one board (5x13 grid) is visible at a time.
+- **Dual-Board View:** Show two boards side-by-side (2x1 grid) on each screen.
 - **Horizontal Navigation (Swipe):** 
-  - Users swipe left/right to move between the 8 boards.
-  - Indicator dots or a "Board X of 8" label to show current position.
+  - Users swipe left/right to move between the 4 pairs of boards (8 boards total).
+  - Indicator dots at the top to show which pair is active (1-2, 3-4, 5-6, 7-8).
 - **Status Tray (Letter Map):**
   - A persistent footer area sitting directly above the native keyboard.
-  - Shows the A-Z alphabet with color-coded status (Green/Yellow/Grey) for the **currently visible board**.
-- **Vertical Stack:** 
-  1. Header (Mode, Progress).
-  2. Active Board (centered).
-  3. Navigation Indicators.
-  4. Status Tray (Letter Map).
-  5. Native Keyboard (Space reserved).
+  - Shows the A-Z alphabet with color-coded status (Green/Yellow/Grey) for the **currently visible pair of boards**. If a letter has different statuses on the two boards, prioritize Green > Yellow > Grey.
+- **Persistent Keyboard:** Keep the native keyboard open by focusing a hidden input field.
 
 ## 5. Technical Requirements
-- **Single File:** HTML, CSS, and JS in one `index.html`.
-- **Touch Handling:** Implement robust touch events for smooth horizontal swiping between boards.
+- **Multi-File Architecture:** Reference `shuffled_real_wordles.txt` and `official_allowed_guesses.txt` using the `fetch` API.
+- **Touch Handling:** Implement robust touch events for smooth horizontal swiping between pairs.
 - **Deterministic Seeding:** PRNG seeded by date for Daily Mode.
-- **Offline Support:** Full functionality without an internet connection once loaded.
+- **Offline Support:** Use a Service Worker (optional) or simply ensure the page is cached by Safari.
 
 ## 6. Success Criteria
 - Native keyboard remains stable and responsive.
-- Swipe gesture feels natural and switches boards correctly.
-- Status tray accurately reflects the state of the visible board.
-- The app fits perfectly on a single iPhone screen without scrolling (besides swiping).
+- Tiles scale down dynamically to ensure all 13 guesses are visible above the keyboard.
+- Swipe gesture switches between board pairs naturally.
+- Dictionary validation works correctly for all 12,000+ words.
