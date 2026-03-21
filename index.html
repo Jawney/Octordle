@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Octordle Personal</title>
     
     <!-- iOS Web App Meta -->
@@ -22,10 +22,9 @@
             --absent: #3a3a3c;
             --border: #3a3a3c;
             --empty: #121213;
-            --tile-size: clamp(30px, 8vw, 50px);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
         
         body {
             background-color: var(--bg);
@@ -42,74 +41,65 @@
         }
 
         header {
-            height: 60px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 15px;
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
-            z-index: 10;
             background: var(--bg);
+            padding-top: env(safe-area-inset-top);
         }
 
-        header h1 { font-size: 1.4rem; margin: 0; letter-spacing: 2px; }
+        header h1 { font-size: 1.1rem; margin: 0; letter-spacing: 2px; }
 
         .btn {
             background: #3a3a3c;
             border: none;
             color: white;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 4px;
             font-weight: bold;
-            font-size: 0.8rem;
-            cursor: pointer;
+            font-size: 0.7rem;
         }
 
-        #game-container {
+        #game-view {
             flex-grow: 1;
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            padding: 12px;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 150px; /* Space for tray */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #board-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            transition: transform 0.3s ease-out;
+        }
+
+        .board-wrapper {
+            flex-shrink: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
         }
 
         .board {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-rows: repeat(13, 1fr);
             gap: 4px;
-            padding: 8px;
-            border: 2px solid #222;
-            border-radius: 8px;
-            opacity: 0.6;
-            transition: all 0.3s;
-            background: #1a1a1b;
-        }
-
-        .board.active {
-            opacity: 1;
-            border-color: #555;
-            background: #202021;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-
-        .board.solved {
-            opacity: 0.4;
-            background: #0a0a0a;
-            border-color: var(--correct);
-        }
-
-        .board-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-            font-size: 0.7rem;
-            color: #888;
-            font-weight: bold;
+            width: 100%;
+            max-width: 300px;
+            height: 100%;
+            max-height: 600px;
         }
 
         .row {
@@ -124,11 +114,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: bold;
             text-transform: uppercase;
             user-select: none;
-            transition: transform 0.4s;
         }
 
         .tile[data-state="correct"] { background-color: var(--correct); border-color: var(--correct); }
@@ -136,19 +125,58 @@
         .tile[data-state="absent"] { background-color: var(--absent); border-color: var(--absent); }
         .tile[data-state="tbd"] { border-color: #565758; }
 
-        /* Keyboard / Input Tray */
-        #input-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(18, 18, 19, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid var(--border);
-            padding: 10px;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
-            z-index: 100;
+        /* Board Indicators */
+        #nav-indicators {
+            height: 20px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px;
         }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #444;
+            transition: background 0.3s;
+        }
+
+        .dot.active { background: #fff; }
+        .dot.solved { background: var(--correct); }
+
+        /* Keyboard / Status Tray */
+        #input-area {
+            flex-shrink: 0;
+            padding-bottom: env(safe-area-inset-bottom);
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
+        .status-tray {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 3px;
+            padding: 8px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .key-hint {
+            height: 32px;
+            border-radius: 4px;
+            background: #818384;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .key-hint[data-state="correct"] { background-color: var(--correct); }
+        .key-hint[data-state="present"] { background-color: var(--present); }
+        .key-hint[data-state="absent"] { background-color: var(--absent); opacity: 0.3; }
 
         #hidden-input {
             position: absolute;
@@ -157,100 +185,70 @@
             left: -9999px;
         }
 
-        .status-tray {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 4px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .key-hint {
-            height: 35px;
-            border-radius: 4px;
-            background: #818384;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-
-        .key-hint[data-state="correct"] { background-color: var(--correct); }
-        .key-hint[data-state="present"] { background-color: var(--present); }
-        .key-hint[data-state="absent"] { background-color: var(--absent); opacity: 0.3; }
-
         #mobile-trigger {
             width: 100%;
-            margin-top: 10px;
-            height: 44px;
-            background: var(--correct);
+            height: 40px;
+            background: transparent;
             border: none;
-            color: white;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: bold;
+            color: #555;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* Message Overlay */
         #message {
             position: fixed;
-            top: 15%;
+            top: 20%;
             left: 50%;
             transform: translateX(-50%);
             background: white;
             color: black;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 5px;
             font-weight: bold;
             z-index: 1000;
             display: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-
-        .mode-indicator {
-            font-size: 0.7rem;
-            color: #aaa;
-            text-align: center;
-            margin-top: 5px;
-        }
-
-        @media (max-width: 400px) {
-            #game-container { grid-template-columns: 1fr; }
-            .tile { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body onclick="focusInput()">
 
     <header>
-        <h1>OCTORDLE</h1>
+        <h1 id="mode-title">OCTORDLE</h1>
         <div style="display: flex; gap: 8px;">
+            <span id="board-count" style="font-size: 0.7rem; color: #888;">1/8</span>
             <button class="btn" onclick="startNewGame()">NEW</button>
         </div>
     </header>
 
-    <div id="game-container">
-        <!-- 8 Boards will be generated here -->
+    <div id="game-view">
+        <div id="board-container">
+            <!-- 8 Boards will be generated here -->
+        </div>
+        
+        <div id="nav-indicators">
+            <!-- 8 Dots will be generated here -->
+        </div>
     </div>
 
     <div id="message"></div>
 
-    <div id="input-container">
+    <div id="input-area">
         <div class="status-tray" id="status-tray">
             <!-- Alphabet hints -->
         </div>
-        <button id="mobile-trigger" onclick="focusInput(event)">TAP TO TYPE</button>
-        <div class="mode-indicator" id="mode-text">DAILY MODE</div>
+        <button id="mobile-trigger" onclick="focusInput(event)">Tap here if keyboard closes</button>
         <input type="text" id="hidden-input" maxlength="5" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
 
     <script>
-        // Standard Wordle Dictionary (Partial list for initial version, full logic included)
-        const ALL_WORDS = ["cigar","rebut","sissy","humph","awake","blush","focal","evade","naval","serve","heath","dwarf","model","karma","stink","grade","quiet","bench","abate","feign","major","death","fresh","crust","stool","colon","abase","marry","react","batty","pride","floss","helix","croak","staff","paper","unfed","whelp","trawl","outdo","adobe","crazy","sower","repay","digit","crate","cluck","spike","court","revel","float","along","point","stare","conic","rearm","pygmy","await","itchy","paddy","feast","shirk","ready","share","again","prowl","rover","girth","glaze","light","cruel","aback","enjoy","ridge","snarl","afire","pagan","lesser","shore","unite","shark","chasm","lipid","gully","chalk","flout","adept","asset","agora","shake","stony","media","motto","utter","bleed","conch","retro","tiny","fruit","glass","grape","green","guess","heart","house","juice","light","lemon","melon","money","music","night","ocean","party","piano","pilot","plane","phone","pizza","plant","radio","river","robot","shirt","shoes","smile","snake","space","spoon","storm","table","tiger","toast","touch","train","truck","voice","water","watch","whale","world","write","youth","zebra"];
+        // Use a compact representation for the word list
+        const SOLUTIONS_STR = "cigarrebutsissyhumphawakeblushfocalevadenavalserveheathdwarfmodelkarmastinkgradequietbenchabatefeignmajordeathfreshcruststoolcolonabasemarryreactbattyprideflosshelixcroakstaffpaperunfedwhelptrawloutdoadobecrazysowerrepaydigitcratecluckspikecourtrevelfloatalongpointstareconicrearmpygmyawaititchypaddyfeastshirkreadyshareagainprowlrovergirthglazelightcruelabackenjoyridgesnarlafirepaganlessershoreunitesharkchasmlipidgullychalkfloutadeptassetagorashakestonymediamottoutterbleedconchretrotinyready"; // ... abbreviated for brevity, but I will include more logic below
         
-        // Mulberry32 PRNG for seeded randomness
+        // I will dynamically fetch or provide a larger set in the final version
+        // For now, let's assume a reasonably sized list for the prototype
+        const ALL_WORDS = ["CIGAR", "REBUT", "SISSY", "HUMPH", "AWAKE", "BLUSH", "FOCAL", "EVADE", "NAVAL", "SERVE", "HEATH", "DWARF", "MODEL", "KARMA", "STINK", "GRADE", "QUIET", "BENCH", "ABATE", "FEIGN", "MAJOR", "DEATH", "FRESH", "CRUST", "STOOL", "COLON", "ABASE", "MARRY", "REACT", "BATTY", "PRIDE", "FLOSS", "HELIX", "CROAK", "STAFF", "PAPER", "UNFED", "WHELP", "TRAWL", "OUTDO", "ADOBE", "CRAZY", "SOWER", "REPAY", "DIGIT", "CRATE", "CLUCK", "SPIKE", "COURT", "REVEL", "FLOAT", "ALONG", "POINT", "STARE", "CONIC", "REARM", "PYGMY", "AWAIT", "ITCHY", "PADDY", "FEAST", "SHIRK", "READY", "SHARE", "AGAIN", "PROWL", "ROVER", "GIRTH", "GLAZE", "LIGHT", "CRUEL", "ABACK", "ENJOY", "RIDGE", "SNARL", "AFIRE", "PAGAN", "LESSER", "SHORE", "UNITE", "SHARK", "CHASM", "LIPID", "GULLY", "CHALK", "FLOUT", "ADEPT", "ASSET", "AGORA", "SHAKE", "STONY", "MEDIA", "MOTTO", "UTTER", "BLEED", "CONCH", "RETRO", "TINY", "APPLE", "BEACH", "BRAIN", "BREAD", "BRUSH", "CHAIR", "CHEST", "CHORD", "CLICK", "CLOCK", "CLOUD", "DANCE", "DIARY", "DRINK", "DRIVE", "EARTH", "FEAST", "FIELD", "FRUIT", "GLASS", "GRAPE", "GREEN", "GUESS", "HEART", "HOUSE", "JUICE", "LIGHT", "LEMON", "MELON", "MONEY", "MUSIC", "NIGHT", "OCEAN", "PARTY", "PIANO", "PILOT", "PLANE", "PHONE", "PIZZA", "PLANT", "RADIO", "RIVER", "ROBOT", "SHIRT", "SHOES", "SMILE", "SNAKE", "SPACE", "SPOON", "STORM", "TABLE", "TIGER", "TOAST", "TOUCH", "TRAIN", "TRUCK", "VOICE", "WATER", "WATCH", "WHALE", "WORLD", "WRITE", "YOUTH", "ZEBRA"];
+
         function mulberry32(a) {
             return function() {
                 var t = a += 0x6D2B79F5;
@@ -263,43 +261,44 @@
         const NUM_BOARDS = 8;
         const MAX_GUESSES = 13;
         let targetWords = [];
-        let boardStates = []; 
+        let boardStates = [];
+        let currentBoardIdx = 0;
         let currentGuess = "";
         let globalGuessCount = 0;
         let isDaily = true;
+
+        // Touch handling for swiping
+        let touchStartX = 0;
+        let touchEndX = 0;
 
         function init(seed) {
             targetWords = [];
             boardStates = [];
             currentGuess = "";
             globalGuessCount = 0;
+            currentBoardIdx = 0;
             
             const rand = mulberry32(seed);
-            const container = document.getElementById('game-container');
+            const container = document.getElementById('board-container');
+            const indicators = document.getElementById('nav-indicators');
             container.innerHTML = '';
+            indicators.innerHTML = '';
 
-            // Select 8 words
             for (let i = 0; i < NUM_BOARDS; i++) {
                 const idx = Math.floor(rand() * ALL_WORDS.length);
                 targetWords.push(ALL_WORDS[idx].toUpperCase());
                 boardStates.push({ guesses: [], solved: false });
-            }
 
-            // Build UI
-            for (let i = 0; i < NUM_BOARDS; i++) {
+                // Create Board Wrapper
+                const wrapper = document.createElement('div');
+                wrapper.className = 'board-wrapper';
+                
                 const board = document.createElement('div');
                 board.className = 'board';
-                board.id = `board-${i}`;
                 
-                const header = document.createElement('div');
-                header.className = 'board-header';
-                header.innerHTML = `<span>BOARD ${i+1}</span><span id="board-status-${i}"></span>`;
-                board.appendChild(header);
-
                 for (let r = 0; r < MAX_GUESSES; r++) {
                     const row = document.createElement('div');
                     row.className = 'row';
-                    row.id = `board-${i}-row-${r}`;
                     for (let c = 0; c < 5; c++) {
                         const tile = document.createElement('div');
                         tile.className = 'tile';
@@ -307,12 +306,19 @@
                     }
                     board.appendChild(row);
                 }
-                container.appendChild(board);
+                wrapper.appendChild(board);
+                container.appendChild(wrapper);
+
+                // Create Dot
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.id = `dot-${i}`;
+                indicators.appendChild(dot);
             }
 
             initTray();
-            updateVisuals();
-            document.getElementById('mode-text').innerText = isDaily ? "DAILY MODE" : "PRACTICE MODE";
+            updateUI();
+            focusInput();
         }
 
         function initTray() {
@@ -327,16 +333,23 @@
             });
         }
 
-        function startDaily() {
-            isDaily = true;
-            const today = new Date();
-            const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-            init(seed);
-        }
+        function updateUI() {
+            const container = document.getElementById('board-container');
+            container.style.transform = `translateX(-${currentBoardIdx * 100}%)`;
+            
+            document.getElementById('board-count').innerText = `${currentBoardIdx + 1}/8`;
+            document.getElementById('mode-title').innerText = isDaily ? "DAILY OCTORDLE" : "PRACTICE OCTORDLE";
 
-        function startNewGame() {
-            isDaily = false;
-            init(Math.floor(Math.random() * 1000000));
+            // Update dots
+            for (let i = 0; i < NUM_BOARDS; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                dot.className = 'dot';
+                if (i === currentBoardIdx) dot.classList.add('active');
+                if (boardStates[i].solved) dot.classList.add('solved');
+            }
+
+            updateVisuals();
+            updateTrayHints();
         }
 
         function focusInput(e) {
@@ -354,13 +367,11 @@
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 if (currentGuess.length === 5) {
-                    if (!ALL_WORDS.includes(currentGuess.toLowerCase())) {
+                    if (!ALL_WORDS.includes(currentGuess)) {
                         showMessage("Not in word list");
                         return;
                     }
                     submitGuess();
-                    input.value = "";
-                    currentGuess = "";
                 } else {
                     showMessage("Too short");
                 }
@@ -377,66 +388,60 @@
                     boardStates[i].guesses.push(guess);
                     if (guess === targetWords[i]) {
                         boardStates[i].solved = true;
-                        document.getElementById(`board-status-${i}`).innerText = "SOLVED";
                     }
                 }
                 if (!boardStates[i].solved) allSolved = false;
             }
 
             globalGuessCount++;
-            updateVisuals();
-            updateTrayHints();
+            currentGuess = "";
+            input.value = "";
+            
+            updateUI();
 
-            if (allSolved) {
-                showMessage("🏆 OCTORDLE COMPLETE!");
-                input.blur();
-            } else if (globalGuessCount >= MAX_GUESSES) {
-                showMessage("GAME OVER");
-                input.blur();
-            } else {
-                // Auto-scroll to first unsolved
-                const first = boardStates.findIndex(s => !s.solved);
-                document.getElementById(`board-${first}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            if (allSolved) showMessage("🏆 YOU WON!");
+            else if (globalGuessCount >= MAX_GUESSES) showMessage("GAME OVER: " + targetWords.join(", "));
         }
 
         function updateVisuals() {
-            for (let i = 0; i < NUM_BOARDS; i++) {
+            const wrappers = document.querySelectorAll('.board-wrapper');
+            wrappers.forEach((wrapper, i) => {
+                const board = wrapper.querySelector('.board');
                 const state = boardStates[i];
-                const boardEl = document.getElementById(`board-${i}`);
                 
-                if (state.solved) boardEl.classList.add('solved');
-                else boardEl.classList.add('active');
-
-                // Render previous guesses
-                state.guesses.forEach((guess, r) => {
-                    const row = document.getElementById(`board-${i}-row-${r}`);
-                    const results = getWordleFeedback(guess, targetWords[i]);
-                    for (let c = 0; c < 5; c++) {
-                        const tile = row.children[c];
-                        tile.innerText = guess[c];
-                        tile.setAttribute('data-state', results[c]);
-                    }
-                });
-
-                // Render current typing
-                if (!state.solved && globalGuessCount < MAX_GUESSES) {
-                    const row = document.getElementById(`board-${i}-row-${globalGuessCount}`);
-                    for (let c = 0; c < 5; c++) {
-                        const tile = row.children[c];
-                        tile.innerText = currentGuess[c] || "";
-                        tile.setAttribute('data-state', currentGuess[c] ? 'tbd' : 'empty');
+                // Rows
+                for (let r = 0; r < MAX_GUESSES; r++) {
+                    const row = board.children[r];
+                    const guess = state.guesses[r];
+                    
+                    if (guess) {
+                        const feedback = getFeedback(guess, targetWords[i]);
+                        for (let c = 0; c < 5; c++) {
+                            const tile = row.children[c];
+                            tile.innerText = guess[c];
+                            tile.setAttribute('data-state', feedback[c]);
+                        }
+                    } else if (r === globalGuessCount && !state.solved) {
+                        for (let c = 0; c < 5; c++) {
+                            const tile = row.children[c];
+                            tile.innerText = currentGuess[c] || "";
+                            tile.setAttribute('data-state', currentGuess[c] ? 'tbd' : 'empty');
+                        }
+                    } else {
+                        for (let c = 0; c < 5; c++) {
+                            const tile = row.children[c];
+                            tile.innerText = "";
+                            tile.setAttribute('data-state', 'empty');
+                        }
                     }
                 }
-            }
+            });
         }
 
-        function getWordleFeedback(guess, target) {
+        function getFeedback(guess, target) {
             const results = new Array(5).fill('absent');
             const targetArr = target.split('');
             const guessArr = guess.split('');
-            
-            // Green pass
             for (let i = 0; i < 5; i++) {
                 if (guessArr[i] === targetArr[i]) {
                     results[i] = 'correct';
@@ -444,7 +449,6 @@
                     guessArr[i] = null;
                 }
             }
-            // Yellow pass
             for (let i = 0; i < 5; i++) {
                 if (guessArr[i] && targetArr.includes(guessArr[i])) {
                     results[i] = 'present';
@@ -455,19 +459,15 @@
         }
 
         function updateTrayHints() {
-            // Update keyboard hints for the FIRST unsolved board
-            const idx = boardStates.findIndex(s => !s.solved);
-            if (idx === -1) return;
-
-            const target = targetWords[idx];
-            const guesses = boardStates[idx].guesses;
+            const target = targetWords[currentBoardIdx];
+            const guesses = boardStates[currentBoardIdx].guesses;
             const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM".split('');
 
             alphabet.forEach(letter => {
                 const hint = document.getElementById(`hint-${letter}`);
                 let best = "";
                 guesses.forEach(g => {
-                    const feedback = getWordleFeedback(g, target);
+                    const feedback = getFeedback(g, target);
                     for(let i=0; i<5; i++) {
                         if (g[i] === letter) {
                             if (feedback[i] === 'correct') best = 'correct';
@@ -485,6 +485,37 @@
             m.innerText = txt;
             m.style.display = 'block';
             setTimeout(() => m.style.display = 'none', 3000);
+        }
+
+        // Swipe Detection
+        document.getElementById('game-view').addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        document.getElementById('game-view').addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, false);
+
+        function handleSwipe() {
+            const diff = touchStartX - touchEndX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0 && currentBoardIdx < NUM_BOARDS - 1) currentBoardIdx++;
+                else if (diff < 0 && currentBoardIdx > 0) currentBoardIdx--;
+                updateUI();
+            }
+        }
+
+        function startDaily() {
+            isDaily = true;
+            const today = new Date();
+            const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+            init(seed);
+        }
+
+        function startNewGame() {
+            isDaily = false;
+            init(Math.floor(Math.random() * 1000000));
         }
 
         startDaily();
