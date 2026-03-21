@@ -1,37 +1,34 @@
-# Requirements Document: Octordle Personal (iOS/GitHub Pages)
+# Requirements Document: Octordle Personal (iPhone Optimized)
 
 ## 1. Project Overview
-A refined, single-file HTML5 application that implements an "Octordle" (8-word Wordle) game. Specifically engineered for the iPhone's vertical aspect ratio and native keyboard behavior.
+A highly specialized Octordle clone tailored specifically for a single user's iPhone. The app prioritizes screen real-estate efficiency to display 13 guess rows across 8 boards without scrolling.
 
 ## 2. Core Game Logic
-- **Objective:** Simultaneously solve 8 different 5-letter words in 13 total guesses.
-- **Game Modes:**
-  - **Daily Mode:** The 8 words are deterministic based on the current date. Progress (guesses made) is saved to `localStorage`.
-  - **Practice Mode:** A "NEW" button generates 8 completely random words.
+- **Objective:** Solve 8 different 5-letter words in 13 total guesses.
+- **Game Modes:** 
+  - **Daily Mode:** Date-seeded words with `localStorage` persistence.
+  - **Practice Mode:** Randomized words for infinite play.
 - **Validation:** 
-  - If an entered word is not in the dictionary, the row should briefly flash or be highlighted in **RED** to indicate an invalid entry.
+  - Invalid words highlight the current row in **RED** and block submission.
+- **Global Keymap:** 
+  - The alphabet tray status must reflect the **global state** across all 8 boards simultaneously. 
+  - Priority: Green (Correct) > Yellow (Present) > Grey (Absent). If a letter is Green on *any* board, it shows as Green in the tray.
 
-## 3. Visual Layout & Scaling (Critical)
-- **Zero Scrolling:** The application must fit perfectly within the visible viewport at all times. Vertical scrolling is strictly disabled.
-- **Aspect Ratio Locking:** All board tiles MUST maintain a perfect 1:1 square aspect ratio.
-- **Active Board Scaling:**
-  - When the native iOS keyboard is visible, the entire game grid (all 13 rows) must automatically scale down in size so that the top of the board is below the header and the bottom of the board is above the Status Tray.
-  - The board container (grey shaded area) must encompass the tiles perfectly without overflow.
-- **Board Separation:** Distinct 15px-20px gap and subtle border/outline between the two active boards on a single screen.
+## 3. Visual Layout (Resolution Specific)
+- **Zero Scrolling:** Vertical scrolling is strictly disabled.
+- **Resolution Debugging:** The app will include a temporary overlay showing `window.visualViewport` dimensions to assist in final hard-coding.
+- **Rectangular Tiles:** Tiles are **not** required to be square. They should stretch/squash to fill the available vertical and horizontal space to ensure all 13 rows are visible.
+- **Dual-Board View:** 2 boards per screen (4 screens total).
+- **Header & Navigation:** 
+  - Minimalist header with "DAILY" and "NEW" buttons.
+  - Indicators for the 4 screens.
+  - Horizontal swipe to navigate.
 
-## 4. iOS & Keyboard Optimization
-- **Auto-Focus:** The native keyboard should attempt to open automatically upon page load or when starting a new game.
-- **Status Tray (Letter Map):**
-  - A compact alphabet map sitting directly above the native keyboard.
-  - No "dead space" between the tray and the native keyboard.
-- **Navigation:** Horizontal swipe gestures to switch between the 4 pairs of boards.
+## 4. iPhone Keyboard Optimization
+- **Persistent Focus:** Native keyboard remains open.
+- **Tight Fit:** Status Tray sits flush against the top of the native keyboard to maximize the "Game Area" height.
 
-## 5. Technical Implementation
-- **Visual Viewport API:** Use `window.visualViewport` to dynamically calculate `availableHeight` and set tile sizes in pixels to ensure a perfect fit.
-- **localStorage:** Persist daily game state.
-- **Fetch API:** Load external word lists.
-
-## 6. Success Criteria
-- All 13 rows of the dual-board view are fully visible simultaneously on an iPhone, both with and without the keyboard open.
-- Tiles never overflow their containers or overlap other boards.
-- Invalid words are clearly indicated with a red highlight.
+## 5. Success Criteria
+- Resolution dimensions are clearly visible for debugging.
+- All 13 rows fit on the screen without scrolling.
+- Alphabet tray correctly aggregates status from all 8 words.

@@ -3,16 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Octordle Personal</title>
-    
-    <!-- iOS Web App Meta -->
+    <title>Octordle Debug</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Octordle">
-    
-    <!-- App Icon -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23121213'/><text x='50' y='65' font-family='Arial' font-size='60' fill='white' text-anchor='middle'>8</text></svg>">
-
     <style>
         :root {
             --bg: #121213;
@@ -22,257 +15,96 @@
             --absent: #3a3a3c;
             --invalid: #e12d2d;
             --border: #3a3a3c;
-            --empty: #121213;
-            --tile-size: 20px;
-            --vh: 100vh;
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-        
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
+            font-family: -apple-system, sans-serif;
+            margin: 0; padding: 0;
+            height: 100dvh; width: 100vw;
+            display: flex; flex-direction: column;
+            overflow: hidden; position: fixed;
         }
-
         header {
-            padding: 10px 10px 5px 10px;
-            flex-shrink: 0;
-            background: var(--bg);
-            padding-top: calc(10px + env(safe-area-inset-top));
+            padding: 10px; flex-shrink: 0;
+            background: #1a1a1b; border-bottom: 1px solid var(--border);
+            padding-top: env(safe-area-inset-top);
         }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
+        #debug-info {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(255,0,0,0.8); color: white;
+            font-size: 10px; font-family: monospace; z-index: 9999;
+            pointer-events: none; padding: 2px;
         }
-
-        header h1 { font-size: 0.9rem; margin: 0; letter-spacing: 1px; font-weight: 800; }
-
-        .header-controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .btn {
-            background: #3a3a3c;
-            border: 1px solid #565758;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-        }
-
-        .btn.active {
-            background: var(--correct);
-            border-color: var(--correct);
-        }
-
         #game-view {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
+            flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;
         }
-
         #board-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
+            width: 100%; height: 100%; display: flex;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
         .screen-wrapper {
-            flex-shrink: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0 10px;
-            gap: 15px; /* Spacing between boards */
+            flex-shrink: 0; width: 100%; height: 100%;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; padding: 5px; align-items: stretch;
         }
-
         .board {
-            display: grid;
-            grid-template-rows: repeat(13, 1fr);
-            gap: 2px;
-            padding: 4px;
-            border: 1px solid #333;
-            border-radius: 4px;
-            background: #1a1a1b;
-            height: fit-content;
-            width: fit-content;
+            display: grid; grid-template-rows: repeat(13, 1fr);
+            gap: 2px; background: #1a1a1b; border-radius: 4px; padding: 2px;
         }
-
-        .row {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 2px;
-        }
-
+        .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; height: 100%; }
         .tile {
-            width: var(--tile-size);
-            height: var(--tile-size);
-            border: 1.5px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: calc(var(--tile-size) * 0.5);
-            font-weight: 700;
-            text-transform: uppercase;
-            user-select: none;
-            border-radius: 2px;
-            transition: background-color 0.2s, border-color 0.2s;
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: bold; text-transform: uppercase;
         }
-
         .tile[data-state="correct"] { background-color: var(--correct); border-color: var(--correct); }
         .tile[data-state="present"] { background-color: var(--present); border-color: var(--present); }
         .tile[data-state="absent"] { background-color: var(--absent); border-color: var(--absent); }
-        .tile[data-state="tbd"] { border-color: #565758; }
-        .row.invalid .tile[data-state="tbd"] { border-color: var(--invalid); color: var(--invalid); }
+        .row.invalid .tile { color: var(--invalid); border-color: var(--invalid); }
 
-        #nav-indicators {
-            height: 20px;
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            align-items: center;
-            flex-shrink: 0;
-            background: var(--bg);
-        }
-
-        .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #3a3a3c;
-        }
-
-        .dot.active { background: #fff; transform: scale(1.1); }
-        .dot.solved { background: var(--correct); }
-
-        #input-area {
-            flex-shrink: 0;
-            background: var(--bg);
-            border-top: 1px solid var(--border);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-
+        #input-area { flex-shrink: 0; background: var(--bg); border-top: 1px solid var(--border); }
         .status-tray {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 3px;
-            padding: 6px;
-            max-width: 400px;
-            margin: 0 auto;
+            display: grid; grid-template-columns: repeat(10, 1fr);
+            gap: 2px; padding: 4px; max-width: 400px; margin: 0 auto;
         }
-
         .key-hint {
-            height: 30px;
-            border-radius: 4px;
-            background: #818384;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: bold;
+            height: 28px; border-radius: 4px; background: #818384;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: bold;
         }
-
         .key-hint[data-state="correct"] { background-color: var(--correct); }
         .key-hint[data-state="present"] { background-color: var(--present); }
         .key-hint[data-state="absent"] { background-color: var(--absent); opacity: 0.4; }
-
-        #hidden-input {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-            left: -9999px;
-        }
-
-        #mobile-trigger {
-            width: 100%;
-            height: 25px;
-            background: transparent;
-            border: none;
-            color: #333;
-            font-size: 0.6rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        #message {
-            position: fixed;
-            top: 20%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            color: black;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-weight: bold;
-            z-index: 1000;
-            display: none;
-            font-size: 0.8rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
+        #hidden-input { position: absolute; opacity: 0; pointer-events: none; left: -9999px; }
+        #mobile-trigger { width: 100%; height: 20px; background: transparent; border: none; color: #444; font-size: 8px; }
     </style>
 </head>
 <body onclick="focusInput()">
-
+    <div id="debug-info">DEBUG: Waiting for viewport...</div>
     <header>
-        <div class="header-top">
-            <h1 id="mode-title">DAILY OCTORDLE</h1>
-            <div class="header-controls">
-                <span id="board-count" style="font-size: 0.65rem; color: #888; font-weight: bold;">1-2/8</span>
-                <button class="btn" id="btn-daily" onclick="startDaily()">DAILY</button>
-                <button class="btn" id="btn-new" onclick="startNewGame()">NEW</button>
-            </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:bold; font-size:12px;">DEBUG OCTORDLE</span>
+            <button onclick="startNewGame()" style="padding:4px 8px; font-size:10px;">NEW</button>
         </div>
     </header>
-
     <div id="game-view">
-        <div id="board-container">
-            <!-- Screens generated here -->
-        </div>
-        <div id="nav-indicators"></div>
+        <div id="board-container"></div>
     </div>
-
-    <div id="message"></div>
-
     <div id="input-area">
         <div class="status-tray" id="status-tray"></div>
-        <button id="mobile-trigger" onclick="focusInput(event)">Keyboard Focus</button>
+        <button id="mobile-trigger">FOCUS KEYBOARD</button>
         <input type="text" id="hidden-input" maxlength="5" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text">
     </div>
-
     <script>
         let SOLUTIONS = [];
         let ALLOWED = [];
         let targetWords = [];
         let boardStates = [];
         let currentScreenIdx = 0;
-        let currentGuess = "";
         let globalGuessCount = 0;
-        let isDaily = true;
-        let dailySeed = 0;
-        let touchStartX = 0;
-        let touchEndX = 0;
+        let currentGuess = "";
 
         async function loadWords() {
             try {
@@ -282,57 +114,30 @@
                 ]);
                 SOLUTIONS = (await solRes.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
                 ALLOWED = (await allowRes.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
-                ALLOWED = Array.from(new Set([...ALLOWED, ...SOLUTIONS]));
-                startDaily();
-            } catch (err) {
-                console.error("Failed to load dictionaries", err);
-                SOLUTIONS = ["APPLE", "BEACH", "BRAIN", "BREAD", "BRUSH", "CHAIR", "CHEST", "CHORD"];
-                ALLOWED = SOLUTIONS;
-                startDaily();
-            }
+                init();
+            } catch(e) { console.error(e); }
         }
 
-        function mulberry32(a) {
-            return function() {
-                var t = a += 0x6D2B79F5;
-                t = Math.imul(t ^ t >>> 15, t | 1);
-                t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-                return ((t ^ t >>> 14) >>> 0) / 4294967296;
-            }
-        }
-
-        function init(seed, loadingSaved = false) {
-            targetWords = [];
-            boardStates = [];
-            currentGuess = "";
-            globalGuessCount = 0;
-            currentScreenIdx = 0;
-            
-            const rand = mulberry32(seed);
+        function init() {
             const container = document.getElementById('board-container');
-            const indicators = document.getElementById('nav-indicators');
             container.innerHTML = '';
-            indicators.innerHTML = '';
-
-            for (let i = 0; i < 8; i++) {
-                const idx = Math.floor(rand() * SOLUTIONS.length);
-                targetWords.push(SOLUTIONS[idx]);
+            targetWords = []; boardStates = [];
+            for(let i=0; i<8; i++) {
+                targetWords.push(SOLUTIONS[Math.floor(Math.random() * SOLUTIONS.length)]);
                 boardStates.push({ guesses: [], solved: false });
             }
-
-            for (let s = 0; s < 4; s++) {
+            for(let s=0; s<4; s++) {
                 const screen = document.createElement('div');
                 screen.className = 'screen-wrapper';
-                for (let b = 0; b < 2; b++) {
-                    const boardIdx = s * 2 + b;
+                for(let b=0; b<2; b++) {
+                    const boardIdx = s*2 + b;
                     const board = document.createElement('div');
                     board.className = 'board';
                     board.id = `board-${boardIdx}`;
-                    for (let r = 0; r < 13; r++) {
+                    for(let r=0; r<13; r++) {
                         const row = document.createElement('div');
                         row.className = 'row';
-                        row.id = `board-${boardIdx}-row-${r}`;
-                        for (let c = 0; c < 5; c++) {
+                        for(let c=0; c<5; c++) {
                             const tile = document.createElement('div');
                             tile.className = 'tile';
                             row.appendChild(tile);
@@ -342,252 +147,135 @@
                     screen.appendChild(board);
                 }
                 container.appendChild(screen);
-
-                const dot = document.createElement('div');
-                dot.className = 'dot';
-                dot.id = `dot-${s}`;
-                indicators.appendChild(dot);
             }
-
-            if (isDaily && !loadingSaved) loadGameState();
             initTray();
-            resizeGame();
             updateUI();
-            setTimeout(focusInput, 100);
-        }
-
-        function resizeGame() {
-            const viewportH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-            const viewportW = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-            const headerH = document.querySelector('header').offsetHeight;
-            const trayH = document.getElementById('input-area').offsetHeight;
-            const navH = document.getElementById('nav-indicators').offsetHeight;
-            
-            const availableH = viewportH - headerH - trayH - navH - 20; 
-            const availableW = viewportW - 40; // Total width for two boards + gaps
-
-            // Tile size restricted by BOTH height (13 rows) and width (2 boards * 5 tiles)
-            const tileSizeH = Math.floor(availableH / 13.5); // Fits 13 rows vertically
-            const tileSizeW = Math.floor(availableW / 11); // Fits 2 boards of 5 tiles + gap
-            
-            const finalTileSize = Math.min(tileSizeH, tileSizeW);
-            document.documentElement.style.setProperty('--tile-size', `${finalTileSize}px`);
-        }
-
-        window.visualViewport?.addEventListener('resize', resizeGame);
-
-        function updateUI() {
-            const container = document.getElementById('board-container');
-            container.style.transform = `translateX(-${currentScreenIdx * 100}%)`;
-            document.getElementById('board-count').innerText = `${currentScreenIdx * 2 + 1}-${currentScreenIdx * 2 + 2}/8`;
-            document.getElementById('mode-title').innerText = isDaily ? "DAILY OCTORDLE" : "PRACTICE OCTORDLE";
-            document.getElementById('btn-daily').classList.toggle('active', isDaily);
-            document.getElementById('btn-new').classList.toggle('active', !isDaily);
-
-            for (let s = 0; s < 4; s++) {
-                const dot = document.getElementById(`dot-${s}`);
-                dot.className = 'dot';
-                if (s === currentScreenIdx) dot.classList.add('active');
-                if (boardStates[s*2].solved && boardStates[s*2+1].solved) dot.classList.add('solved');
-            }
-            updateVisuals();
-            updateTrayHints();
-        }
-
-        function focusInput(e) {
-            if (e) e.stopPropagation();
-            const input = document.getElementById('hidden-input');
-            input.focus();
-        }
-
-        const input = document.getElementById('hidden-input');
-        input.addEventListener('input', () => {
-            currentGuess = input.value.toUpperCase();
-            // Clear any invalid states on input
-            document.querySelectorAll('.row.invalid').forEach(r => r.classList.remove('invalid'));
-            updateVisuals();
-        });
-
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                if (currentGuess.length === 5) {
-                    if (!ALLOWED.includes(currentGuess)) {
-                        markInvalid();
-                        return;
-                    }
-                    submitGuess();
-                }
-            }
-        });
-
-        function markInvalid() {
-            const b1 = currentScreenIdx * 2;
-            const b2 = b1 + 1;
-            [b1, b2].forEach(idx => {
-                if (!boardStates[idx].solved) {
-                    document.getElementById(`board-${idx}-row-${globalGuessCount}`).classList.add('invalid');
-                }
-            });
-            showMessage("INVALID WORD");
-        }
-
-        function submitGuess() {
-            if (globalGuessCount >= 13) return;
-            const guess = currentGuess;
-            let allSolved = true;
-
-            for (let i = 0; i < 8; i++) {
-                if (!boardStates[i].solved) {
-                    boardStates[i].guesses.push(guess);
-                    if (guess === targetWords[i]) boardStates[i].solved = true;
-                }
-                if (!boardStates[i].solved) allSolved = false;
-            }
-
-            globalGuessCount++;
-            currentGuess = "";
-            input.value = "";
-            if (isDaily) saveGameState();
-            updateUI();
-            if (allSolved) showMessage("🏆 YOU WON!");
-        }
-
-        function updateVisuals() {
-            for (let i = 0; i < 8; i++) {
-                const board = document.getElementById(`board-${i}`);
-                const state = boardStates[i];
-                for (let r = 0; r < 13; r++) {
-                    const row = board.querySelectorAll('.row')[r];
-                    const guess = state.guesses[r];
-                    if (guess) {
-                        const feedback = getFeedback(guess, targetWords[i]);
-                        for (let c = 0; c < 5; c++) {
-                            const tile = row.children[c];
-                            tile.innerText = guess[c];
-                            tile.setAttribute('data-state', feedback[c]);
-                        }
-                    } else if (r === globalGuessCount && !state.solved) {
-                        for (let c = 0; c < 5; c++) {
-                            const tile = row.children[c];
-                            tile.innerText = currentGuess[c] || "";
-                            tile.setAttribute('data-state', currentGuess[c] ? 'tbd' : 'empty');
-                        }
-                    } else {
-                        for (let c = 0; c < 5; c++) {
-                            const tile = row.children[c];
-                            tile.innerText = "";
-                            tile.setAttribute('data-state', 'empty');
-                        }
-                    }
-                }
-            }
-        }
-
-        function getFeedback(guess, target) {
-            const res = new Array(5).fill('absent');
-            const targetArr = target.split('');
-            const guessArr = guess.split('');
-            for (let i = 0; i < 5; i++) {
-                if (guessArr[i] === targetArr[i]) {
-                    res[i] = 'correct';
-                    targetArr[i] = null;
-                    guessArr[i] = null;
-                }
-            }
-            for (let i = 0; i < 5; i++) {
-                if (guessArr[i] && targetArr.includes(guessArr[i])) {
-                    res[i] = 'present';
-                    targetArr[targetArr.indexOf(guessArr[i])] = null;
-                }
-            }
-            return res;
+            updateDebug();
         }
 
         function initTray() {
             const tray = document.getElementById('status-tray');
             tray.innerHTML = '';
-            "QWERTYUIOPASDFGHJKLZXCVBNM".split('').forEach(letter => {
-                const hint = document.createElement('div');
-                hint.className = 'key-hint';
-                hint.id = `hint-${letter}`;
-                hint.innerText = letter;
-                tray.appendChild(hint);
+            "QWERTYUIOPASDFGHJKLZXCVBNM".split('').forEach(l => {
+                const h = document.createElement('div');
+                h.className = 'key-hint';
+                h.id = `hint-${l}`;
+                h.innerText = l;
+                tray.appendChild(h);
             });
         }
 
-        function updateTrayHints() {
-            const b1 = currentScreenIdx * 2;
-            const b2 = b1 + 1;
-            const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM".split('');
-            alphabet.forEach(letter => {
-                const hint = document.getElementById(`hint-${letter}`);
-                let status = "";
-                [b1, b2].forEach(idx => {
-                    const target = targetWords[idx];
-                    boardStates[idx].guesses.forEach(g => {
-                        const feedback = getFeedback(g, target);
-                        for (let i=0; i<5; i++) {
-                            if (g[i] === letter) {
-                                if (feedback[i] === 'correct') status = 'correct';
-                                else if (feedback[i] === 'present' && status !== 'correct') status = 'present';
-                                else if (status === "") status = 'absent';
-                            }
+        function updateUI() {
+            document.getElementById('board-container').style.transform = `translateX(-${currentScreenIdx * 100}%)`;
+            for(let i=0; i<8; i++) {
+                const board = document.getElementById(`board-${i}`);
+                const state = boardStates[i];
+                for(let r=0; r<13; r++) {
+                    const row = board.children[r];
+                    const guess = state.guesses[r];
+                    if(guess) {
+                        const feedback = getFeedback(guess, targetWords[i]);
+                        for(let c=0; c<5; c++) {
+                            const t = row.children[c];
+                            t.innerText = guess[c];
+                            t.setAttribute('data-state', feedback[c]);
                         }
-                    });
-                });
-                hint.setAttribute('data-state', status);
-            });
-        }
-
-        function showMessage(txt) {
-            const m = document.getElementById('message');
-            m.innerText = txt;
-            m.style.display = 'block';
-            setTimeout(() => m.style.display = 'none', 3000);
-        }
-
-        function handleSwipe() {
-            const diff = touchStartX - touchEndX;
-            if (Math.abs(diff) > 40) {
-                if (diff > 0 && currentScreenIdx < 3) currentScreenIdx++;
-                else if (diff < 0 && currentScreenIdx > 0) currentScreenIdx--;
-                updateUI();
-            }
-        }
-
-        document.getElementById('game-view').addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
-        document.getElementById('game-view').addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipe(); }, false);
-
-        function saveGameState() {
-            const state = { seed: dailySeed, guesses: boardStates.map(b => b.guesses), count: globalGuessCount };
-            localStorage.setItem('octordle_daily_state', JSON.stringify(state));
-        }
-
-        function loadGameState() {
-            const saved = localStorage.getItem('octordle_daily_state');
-            if (saved) {
-                const state = JSON.parse(saved);
-                if (state.seed === dailySeed) {
-                    globalGuessCount = state.count;
-                    for (let i = 0; i < 8; i++) {
-                        boardStates[i].guesses = state.guesses[i] || [];
-                        if (boardStates[i].guesses.includes(targetWords[i])) boardStates[i].solved = true;
+                    } else if(r === globalGuessCount) {
+                        for(let c=0; c<5; c++) {
+                            const t = row.children[c];
+                            t.innerText = currentGuess[c] || "";
+                            t.setAttribute('data-state', currentGuess[c] ? 'tbd' : 'empty');
+                        }
+                    } else {
+                        for(let c=0; c<5; c++) {
+                            row.children[c].innerText = "";
+                            row.children[c].setAttribute('data-state', 'empty');
+                        }
                     }
                 }
             }
+            updateGlobalTray();
         }
 
-        function startDaily() {
-            isDaily = true;
-            const today = new Date();
-            dailySeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-            init(dailySeed);
+        function getFeedback(guess, target) {
+            const res = new Array(5).fill('absent');
+            const tArr = target.split('');
+            const gArr = guess.split('');
+            for(let i=0; i<5; i++) { if(gArr[i] === tArr[i]) { res[i] = 'correct'; tArr[i] = null; gArr[i] = null; } }
+            for(let i=0; i<5; i++) { if(gArr[i] && tArr.includes(gArr[i])) { res[i] = 'present'; tArr[tArr.indexOf(gArr[i])] = null; } }
+            return res;
         }
 
-        function startNewGame() {
-            isDaily = false;
-            init(Math.floor(Math.random() * 1000000), true);
+        function updateGlobalTray() {
+            const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM".split('');
+            alphabet.forEach(letter => {
+                const hint = document.getElementById(`hint-${letter}`);
+                let bestStatus = "";
+                for(let i=0; i<8; i++) {
+                    const target = targetWords[i];
+                    boardStates[i].guesses.forEach(g => {
+                        const f = getFeedback(g, target);
+                        for(let c=0; c<5; c++) {
+                            if(g[c] === letter) {
+                                if(f[c] === 'correct') bestStatus = 'correct';
+                                else if(f[c] === 'present' && bestStatus !== 'correct') bestStatus = 'present';
+                                else if(bestStatus === "") bestStatus = 'absent';
+                            }
+                        }
+                    });
+                }
+                hint.setAttribute('data-state', bestStatus);
+            });
         }
+
+        function focusInput() { document.getElementById('hidden-input').focus(); }
+        const input = document.getElementById('hidden-input');
+        input.addEventListener('input', () => { currentGuess = input.value.toUpperCase(); updateUI(); });
+        input.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' && currentGuess.length === 5) {
+                if(!ALLOWED.includes(currentGuess)) { showInvalid(); return; }
+                submitGuess();
+            }
+        });
+
+        function submitGuess() {
+            const g = currentGuess;
+            for(let i=0; i<8; i++) {
+                if(!boardStates[i].solved) {
+                    boardStates[i].guesses.push(g);
+                    if(g === targetWords[i]) boardStates[i].solved = true;
+                }
+            }
+            globalGuessCount++; currentGuess = ""; input.value = ""; updateUI();
+        }
+
+        function showInvalid() {
+            const wrapper = document.querySelectorAll('.screen-wrapper')[currentScreenIdx];
+            wrapper.querySelectorAll('.board').forEach(b => {
+                const row = b.children[globalGuessCount];
+                row.classList.add('invalid');
+                setTimeout(() => row.classList.remove('invalid'), 1000);
+            });
+        }
+
+        function updateDebug() {
+            const v = window.visualViewport;
+            document.getElementById('debug-info').innerText = 
+                `RES: ${window.innerWidth}x${window.innerHeight} | VIEW: ${Math.round(v.width)}x${Math.round(v.height)} (offset: ${Math.round(v.offsetTop)})`;
+        }
+        window.visualViewport.addEventListener('resize', updateDebug);
+        window.visualViewport.addEventListener('scroll', updateDebug);
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+        document.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if(Math.abs(diff) > 50) {
+                if(diff > 0 && currentScreenIdx < 3) currentScreenIdx++;
+                else if(diff < 0 && currentScreenIdx > 0) currentScreenIdx--;
+                updateUI();
+            }
+        });
 
         loadWords();
     </script>
