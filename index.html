@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Octordle Pro 430x873</title>
+    <title>Octordle Pro</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
@@ -15,43 +15,39 @@
             --absent: #3a3a3c;
             --invalid: #e12d2d;
             --border: #3a3a3c;
-            /* Hard-coded for 430x873 iPhone with 546px open viewport */
-            --header-h: 50px;
-            --tray-h: 80px;
+            /* Precise dimensions for 430x546 open viewport */
+            --header-h: 45px;
             --nav-h: 20px;
-            --row-h: 28px; /* 28px * 13 rows = 364px. Fits perfectly in 396px area. */
+            --tray-h: 80px;
+            --row-h: 25px; /* 13 rows * 25px = 325px. Total = 470px. well within 546px. */
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: none; }
         body {
             background-color: var(--bg);
             color: var(--text);
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0; padding: 0;
-            width: 100vw;
+            width: 100vw; height: 100dvh;
             display: flex; flex-direction: column;
             overflow: hidden; position: fixed;
-            /* Dynamic height will be set by JS based on visualViewport */
-            height: 100dvh;
+            top: 0; left: 0;
         }
         header {
             height: var(--header-h); flex-shrink: 0;
             background: #1a1a1b; border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 15px; padding-top: env(safe-area-inset-top);
+            padding: 0 10px; padding-top: 5px; /* Manual offset for notch */
         }
-        header h1 { font-size: 0.85rem; margin: 0; font-weight: 900; letter-spacing: 1px; }
-        .btn-row { display: flex; gap: 6px; }
+        header h1 { font-size: 0.8rem; margin: 0; font-weight: 800; letter-spacing: 1px; }
+        .btn-row { display: flex; gap: 5px; }
         .btn { 
             background: #3a3a3c; border: 1px solid #555; color: white; 
-            padding: 4px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; 
-            text-transform: uppercase;
+            padding: 3px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; 
         }
         .btn.active { background: var(--correct); border-color: var(--correct); }
-        
-        #game-area {
-            flex-grow: 1; position: relative; overflow: hidden;
-            display: flex; flex-direction: column;
-            background: var(--bg);
+
+        #main-container {
+            flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;
         }
         #board-slider {
             width: 100%; height: 100%; display: flex;
@@ -60,20 +56,18 @@
         .screen-pair {
             flex-shrink: 0; width: 100%; height: 100%;
             display: grid; grid-template-columns: 1fr 1fr;
-            gap: 10px; padding: 5px 10px; align-items: start;
+            gap: 8px; padding: 5px 8px; align-items: start;
         }
-        .board-container {
+        .board-box {
+            background: #1a1a1b; border: 1px solid #333; border-radius: 4px; padding: 2px;
             display: flex; flex-direction: column;
-            background: #1a1a1b; border: 1px solid #333; border-radius: 6px; padding: 2px;
         }
-        .grid {
-            display: grid; grid-template-rows: repeat(13, var(--row-h)); gap: 1px;
-        }
+        .grid { display: grid; grid-template-rows: repeat(13, var(--row-h)); gap: 1px; }
         .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; height: var(--row-h); }
         .tile {
             border: 1px solid var(--border);
             display: flex; align-items: center; justify-content: center;
-            font-size: 14px; font-weight: bold; text-transform: uppercase;
+            font-size: 13px; font-weight: bold; text-transform: uppercase;
             background: var(--bg);
         }
         .tile[data-state="correct"] { background-color: var(--correct); border-color: var(--correct); }
@@ -83,74 +77,64 @@
         .row.invalid .tile { color: var(--invalid); border-color: var(--invalid); }
 
         #nav-dots {
-            height: var(--nav-h); display: flex; gap: 10px; align-items: center; justify-content: center;
+            height: var(--nav-h); display: flex; gap: 8px; align-items: center; justify-content: center;
             background: var(--bg); flex-shrink: 0;
         }
-        .dot { width: 6px; height: 6px; border-radius: 50%; background: #3a3a3c; }
-        .dot.active { background: #fff; transform: scale(1.2); }
+        .dot { width: 5px; height: 5px; border-radius: 50%; background: #3a3a3c; }
+        .dot.active { background: #fff; }
         .dot.solved { background: var(--correct); }
 
-        #input-dock {
+        #dock {
             height: var(--tray-h); flex-shrink: 0;
             background: var(--bg); border-top: 1px solid var(--border);
-            padding-bottom: env(safe-area-inset-bottom);
         }
-        .key-tray {
-            display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px;
-            padding: 4px; max-width: 430px; margin: 0 auto;
+        .keymap {
+            display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px;
+            padding: 3px; max-width: 430px; margin: 0 auto;
         }
         .key {
-            height: 32px; border-radius: 4px; background: #818384;
+            height: 30px; border-radius: 3px; background: #818384;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.8rem; font-weight: bold;
+            font-size: 0.75rem; font-weight: bold;
         }
         .key[data-state="correct"] { background-color: var(--correct); }
         .key[data-state="present"] { background-color: var(--present); }
-        .key[data-state="absent"] { background-color: var(--absent); opacity: 0.4; }
+        .key[data-state="absent"] { background-color: var(--absent); opacity: 0.3; }
 
         #hidden-input { position: absolute; opacity: 0; pointer-events: none; left: -9999px; }
-        #keyboard-trigger { width: 100%; height: 20px; background: transparent; border: none; color: #333; font-size: 8px; font-weight: bold; }
-        
+        #keyboard-btn { width: 100%; height: 15px; background: transparent; border: none; color: #333; font-size: 7px; }
         #message {
-            position: fixed; top: 15%; left: 50%; transform: translateX(-50%);
-            background: white; color: black; padding: 10px 20px; border-radius: 6px;
-            font-weight: bold; z-index: 1000; display: none; font-size: 0.8rem;
+            position: fixed; top: 10%; left: 50%; transform: translateX(-50%);
+            background: white; color: black; padding: 8px 15px; border-radius: 4px;
+            font-weight: bold; z-index: 9999; display: none; font-size: 0.7rem;
         }
     </style>
 </head>
 <body onclick="focusInput()">
     <header>
-        <h1 id="mode-text">DAILY OCTORDLE</h1>
+        <h1 id="mode-label">DAILY OCTORDLE</h1>
         <div class="btn-row">
             <button class="btn" id="btn-daily" onclick="startDaily()">DAILY</button>
             <button class="btn" id="btn-new" onclick="startNewGame()">NEW</button>
         </div>
     </header>
 
-    <div id="game-area">
+    <div id="main-container">
         <div id="board-slider"></div>
     </div>
 
     <div id="nav-dots"></div>
 
-    <div id="input-dock">
-        <div class="key-tray" id="key-tray"></div>
-        <button id="keyboard-trigger">RE-FOCUS KEYBOARD</button>
+    <div id="dock">
+        <div class="keymap" id="keymap"></div>
+        <button id="keyboard-btn">FOCUS</button>
         <input type="text" id="hidden-input" maxlength="5" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text">
     </div>
 
     <div id="message"></div>
 
     <script>
-        let SOLUTIONS = [];
-        let ALLOWED = [];
-        let targetWords = [];
-        let boardStates = [];
-        let currentScreenIdx = 0;
-        let globalGuessCount = 0;
-        let currentGuess = "";
-        let isDaily = true;
-        let dailySeed = 0;
+        let SOLUTIONS = [], ALLOWED = [], targetWords = [], boardStates = [], currentScreenIdx = 0, globalGuessCount = 0, currentGuess = "", isDaily = true, dailySeed = 0;
 
         async function load() {
             const [s, a] = await Promise.all([fetch('shuffled_real_wordles.txt'), fetch('official_allowed_guesses.txt')]);
@@ -159,25 +143,22 @@
             startDaily();
         }
 
-        function init(seed, isNewGame = false) {
-            const slider = document.getElementById('board-slider');
-            const dots = document.getElementById('nav-dots');
+        function init(seed, isNew = false) {
+            const slider = document.getElementById('board-slider'), dots = document.getElementById('nav-dots');
             slider.innerHTML = ''; dots.innerHTML = '';
             targetWords = []; boardStates = []; globalGuessCount = 0; currentGuess = ""; currentScreenIdx = 0;
-            
             const rand = mulberry32(seed);
             for(let i=0; i<8; i++) {
                 targetWords.push(SOLUTIONS[Math.floor(rand() * SOLUTIONS.length)]);
                 boardStates.push({ guesses: [], solved: false });
             }
-
             for(let s=0; s<4; s++) {
                 const screen = document.createElement('div');
                 screen.className = 'screen-pair';
                 for(let b=0; b<2; b++) {
                     const idx = s*2 + b;
-                    const container = document.createElement('div');
-                    container.className = 'board-container';
+                    const box = document.createElement('div');
+                    box.className = 'board-box';
                     const grid = document.createElement('div');
                     grid.className = 'grid';
                     grid.id = `board-${idx}`;
@@ -191,8 +172,8 @@
                         }
                         grid.appendChild(row);
                     }
-                    container.appendChild(grid);
-                    screen.appendChild(container);
+                    box.appendChild(grid);
+                    screen.appendChild(box);
                 }
                 slider.appendChild(screen);
                 const dot = document.createElement('div');
@@ -200,94 +181,63 @@
                 dot.id = `dot-${s}`;
                 dots.appendChild(dot);
             }
-
-            if (isDaily && !isNewGame) loadState();
-            
-            initTray();
-            updateUI();
-            updateViewport();
-            setTimeout(focusInput, 300);
+            if (isDaily && !isNew) loadState();
+            initTray(); updateUI(); 
+            setTimeout(() => { updateViewport(); focusInput(); }, 300);
         }
 
         function initTray() {
-            const tray = document.getElementById('key-tray');
+            const tray = document.getElementById('keymap');
             tray.innerHTML = '';
             "QWERTYUIOPASDFGHJKLZXCVBNM".split('').forEach(l => {
                 const k = document.createElement('div');
-                k.className = 'key';
-                k.id = `key-${l}`;
-                k.innerText = l;
-                tray.appendChild(k);
+                k.className = 'key'; k.id = `key-${l}`; k.innerText = l; tray.appendChild(k);
             });
         }
 
         function updateUI() {
             document.getElementById('board-slider').style.transform = `translateX(-${currentScreenIdx * 100}%)`;
-            document.getElementById('mode-text').innerText = isDaily ? "DAILY OCTORDLE" : "PRACTICE OCTORDLE";
+            document.getElementById('mode-label').innerText = isDaily ? "DAILY OCTORDLE" : "PRACTICE OCTORDLE";
             document.getElementById('btn-daily').classList.toggle('active', isDaily);
             document.getElementById('btn-new').classList.toggle('active', !isDaily);
-
             for(let s=0; s<4; s++) document.getElementById(`dot-${s}`).classList.toggle('active', s === currentScreenIdx);
-            
             for(let i=0; i<8; i++) {
-                const grid = document.getElementById(`board-${i}`);
-                const state = boardStates[i];
+                const grid = document.getElementById(`board-${i}`), state = boardStates[i];
                 for(let r=0; r<13; r++) {
-                    const row = grid.children[r];
-                    const guess = state.guesses[r];
-                    if(guess) {
-                        const feedback = getFeedback(guess, targetWords[i]);
-                        for(let c=0; c<5; c++) {
-                            const t = row.children[c];
-                            t.innerText = guess[c];
-                            t.setAttribute('data-state', feedback[c]);
-                        }
+                    const row = grid.children[r], g = state.guesses[r];
+                    if(g) {
+                        const feedback = getFeedback(g, targetWords[i]);
+                        for(let c=0; c<5; c++) { row.children[c].innerText = g[c]; row.children[c].setAttribute('data-state', feedback[c]); }
                     } else if(r === globalGuessCount && !state.solved) {
-                        for(let c=0; c<5; c++) {
-                            const t = row.children[c];
-                            t.innerText = currentGuess[c] || "";
-                            t.setAttribute('data-state', currentGuess[c] ? 'tbd' : 'empty');
-                        }
+                        for(let c=0; c<5; c++) { row.children[c].innerText = currentGuess[c] || ""; row.children[c].setAttribute('data-state', currentGuess[c] ? 'tbd' : 'empty'); }
                     } else {
-                        for(let c=0; c<5; c++) {
-                            row.children[c].innerText = "";
-                            row.children[c].setAttribute('data-state', 'empty');
-                        }
+                        for(let c=0; c<5; c++) { row.children[c].innerText = ""; row.children[c].setAttribute('data-state', 'empty'); }
                     }
                 }
             }
-            updateGlobalKeymap();
+            updateTray();
         }
 
-        function updateGlobalKeymap() {
-            const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM".split('');
-            alphabet.forEach(letter => {
-                const key = document.getElementById(`key-${letter}`);
-                let best = "";
+        function updateTray() {
+            "QWERTYUIOPASDFGHJKLZXCVBNM".split('').forEach(l => {
+                const k = document.getElementById(`key-${l}`);
+                let b = "";
                 for(let i=0; i<8; i++) {
-                    const target = targetWords[i];
+                    const t = targetWords[i];
                     boardStates[i].guesses.forEach(g => {
-                        const feedback = getFeedback(g, target);
-                        for(let c=0; c<5; c++) {
-                            if(g[c] === letter) {
-                                if(feedback[c] === 'correct') best = 'correct';
-                                else if(feedback[c] === 'present' && best !== 'correct') best = 'present';
-                                else if(best === "") best = 'absent';
-                            }
-                        }
+                        const f = getFeedback(g, t);
+                        for(let c=0; c<5; c++) { if(g[c] === l) { if(f[c] === 'correct') b = 'correct'; else if(f[c] === 'present' && b !== 'correct') b = 'present'; else if(b === "") b = 'absent'; } }
                     });
                 }
-                key.setAttribute('data-state', best);
+                k.setAttribute('data-state', b);
             });
         }
 
-        function getFeedback(guess, target) {
-            const res = new Array(5).fill('absent');
-            const tArr = target.split('');
-            const gArr = guess.split('');
-            for(let i=0; i<5; i++) { if(gArr[i] === tArr[i]) { res[i] = 'correct'; tArr[i] = null; gArr[i] = null; } }
-            for(let i=0; i<5; i++) { if(gArr[i] && tArr.includes(gArr[i])) { res[i] = 'present'; tArr[tArr.indexOf(gArr[i])] = null; } }
-            return res;
+        function getFeedback(g, t) {
+            const r = new Array(5).fill('absent'), ta = t.split(''), ga = g.split('');
+            for(let i=0; i<5; i++) { if(ga[i] === ta[i]) { r[i] = 'correct'; ta[i] = null; ga[i] = null; } }
+            for(let i=0; i<5; i++) { if(ga[i] && ta.includes(ga[i])) { r[i] = 'present'; ta[ta.indexOf(ga[i])] = null; } }
+            return r;
         }
 
         function focusInput() { document.getElementById('hidden-input').focus(); }
@@ -296,31 +246,14 @@
         input.addEventListener('keydown', (e) => {
             if(e.key === 'Enter' && currentGuess.length === 5) {
                 if(!ALLOWED.includes(currentGuess)) { showInvalid(); return; }
-                submitGuess();
+                const g = currentGuess;
+                for(let i=0; i<8; i++) { if(!boardStates[i].solved) { boardStates[i].guesses.push(g); if(g === targetWords[i]) boardStates[i].solved = true; } }
+                globalGuessCount++; currentGuess = ""; input.value = ""; if(isDaily) saveState(); updateUI();
             }
         });
 
-        function submitGuess() {
-            const g = currentGuess;
-            for(let i=0; i<8; i++) {
-                if(!boardStates[i].solved) {
-                    boardStates[i].guesses.push(g);
-                    if(g === targetWords[i]) boardStates[i].solved = true;
-                }
-            }
-            globalGuessCount++; currentGuess = ""; input.value = ""; 
-            if(isDaily) saveState();
-            updateUI();
-        }
-
         function showInvalid() {
-            const pairs = document.querySelectorAll('.screen-pair');
-            pairs[currentScreenIdx].querySelectorAll('.row').forEach(row => {
-                if(row === row.parentElement.children[globalGuessCount]) {
-                    row.classList.add('invalid');
-                    setTimeout(() => row.classList.remove('invalid'), 800);
-                }
-            });
+            document.querySelectorAll('.screen-pair')[currentScreenIdx].querySelectorAll('.row').forEach(row => { if(row === row.parentElement.children[globalGuessCount]) { row.classList.add('invalid'); setTimeout(() => row.classList.remove('invalid'), 800); } });
             showMessage("NOT IN WORD LIST");
         }
 
@@ -328,54 +261,30 @@
             const v = window.visualViewport;
             document.body.style.height = v.height + "px";
             document.body.style.top = v.offsetTop + "px";
+            window.scrollTo(0, 0); // Force scroll lock
         }
         window.visualViewport.addEventListener('resize', updateViewport);
         window.visualViewport.addEventListener('scroll', updateViewport);
-
-        function showMessage(txt) {
-            const m = document.getElementById('message');
-            m.innerText = txt;
-            m.style.display = 'block';
-            setTimeout(() => m.style.display = 'none', 2000);
-        }
+        
+        function showMessage(txt) { const m = document.getElementById('message'); m.innerText = txt; m.style.display = 'block'; setTimeout(() => m.style.display = 'none', 2000); }
 
         let touchStartX = 0;
-        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
-        document.addEventListener('touchend', e => {
-            const diff = touchStartX - e.changedTouches[0].screenX;
-            if(Math.abs(diff) > 40) {
-                if(diff > 0 && currentScreenIdx < 3) currentScreenIdx++;
-                else if(diff < 0 && currentScreenIdx > 0) currentScreenIdx--;
-                updateUI();
-            }
-        });
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
+        document.addEventListener('touchend', e => { const diff = touchStartX - e.changedTouches[0].screenX; if(Math.abs(diff) > 40) { if(diff > 0 && currentScreenIdx < 3) currentScreenIdx++; else if(diff < 0 && currentScreenIdx > 0) currentScreenIdx--; updateUI(); } }, false);
 
-        function saveState() {
-            const state = { seed: dailySeed, guesses: boardStates.map(b => b.guesses), count: globalGuessCount };
-            localStorage.setItem('octordle_v2_state', JSON.stringify(state));
-        }
+        function saveState() { localStorage.setItem('octordle_final_state', JSON.stringify({ seed: dailySeed, guesses: boardStates.map(b => b.guesses), count: globalGuessCount })); }
         function loadState() {
-            const saved = localStorage.getItem('octordle_v2_state');
+            const saved = localStorage.getItem('octordle_final_state');
             if(saved) {
                 const s = JSON.parse(saved);
                 if(s.seed === dailySeed) {
                     globalGuessCount = s.count;
-                    for(let i=0; i<8; i++) {
-                        boardStates[i].guesses = s.guesses[i] || [];
-                        if(boardStates[i].guesses.includes(targetWords[i])) boardStates[i].solved = true;
-                    }
+                    for(let i=0; i<8; i++) { boardStates[i].guesses = s.guesses[i] || []; if(boardStates[i].guesses.includes(targetWords[i])) boardStates[i].solved = true; }
                 }
             }
         }
 
-        function mulberry32(a) {
-            return function() {
-                var t = a += 0x6D2B79F5;
-                t = Math.imul(t ^ t >>> 15, t | 1);
-                t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-                return ((t ^ t >>> 14) >>> 0) / 4294967296;
-            }
-        }
+        function mulberry32(a) { return function() { var t = a += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; } }
         function startDaily() { isDaily = true; const d = new Date(); dailySeed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(); init(dailySeed); }
         function startNewGame() { isDaily = false; init(Math.floor(Math.random() * 1000000), true); }
 
