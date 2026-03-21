@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Octordle Pro v4</title>
+    <title>Octordle Pro v5</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
@@ -15,40 +15,45 @@
             --absent: #3a3a3c;
             --invalid: #e12d2d;
             --border: #3a3a3c;
-            /* Hard-coded for iPhone 14/15 Pro safe areas */
+            --tile-text: #ffffff; /* High contrast white text on colors */
+            
+            /* iPhone 14/15 Pro Specifics */
+            --safe-top: 47px;
             --header-h: 40px;
+            --dock-h: 110px; /* High enough to clear the 44px Accessory Bar */
             --nav-h: 15px;
-            --dock-h: 75px;
-            --row-h: 22px; /* Ultra-compact to fit above the Accessory Bar */
+            --row-h: 27px; /* Increased to fill the black space */
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: none; }
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0; padding: 0;
             width: 100vw; height: 100dvh;
             display: flex; flex-direction: column;
             overflow: hidden; position: fixed;
             top: 0; left: 0;
         }
-        #safe-top { height: 44px; flex-shrink: 0; background: var(--bg); } /* Clears Dynamic Island */
+        #safe-top { height: var(--safe-top); flex-shrink: 0; background: var(--bg); }
         header {
             height: var(--header-h); flex-shrink: 0;
             background: #1a1a1b; border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 10px;
+            padding: 0 12px;
         }
-        header h1 { font-size: 0.8rem; margin: 0; font-weight: 800; letter-spacing: 1px; }
-        .btn-row { display: flex; gap: 5px; }
+        header h1 { font-size: 0.9rem; margin: 0; font-weight: 900; letter-spacing: 1px; }
+        .btn-row { display: flex; gap: 6px; }
         .btn { 
-            background: #3a3a3c; border: 1px solid #555; color: white; 
-            padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; 
+            background: #3a3a3c; border: 1.5px solid #555; color: white; 
+            padding: 3px 10px; border-radius: 5px; font-size: 0.65rem; font-weight: 800; 
+            text-transform: uppercase;
         }
         .btn.active { background: var(--correct); border-color: var(--correct); }
 
         #main-container {
             flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;
+            background: var(--bg);
         }
         #board-slider {
             width: 100%; height: 100%; display: flex;
@@ -57,45 +62,46 @@
         .screen-pair {
             flex-shrink: 0; width: 100%; height: 100%;
             display: grid; grid-template-columns: 1fr 1fr;
-            gap: 6px; padding: 4px 6px; align-items: start;
+            gap: 10px; padding: 6px 10px; align-items: start;
         }
         .board-box {
-            background: #1a1a1b; border: 1px solid #333; border-radius: 4px; padding: 1px;
+            background: #1a1a1b; border: 1px solid #333; border-radius: 4px; padding: 2px;
         }
-        .grid { display: grid; grid-template-rows: repeat(13, var(--row-h)); gap: 1px; }
-        .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; height: var(--row-h); }
+        .grid { display: grid; grid-template-rows: repeat(13, var(--row-h)); gap: 2px; }
+        .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; height: var(--row-h); }
         .tile {
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             display: flex; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: 800; text-transform: uppercase;
-            background: var(--bg);
+            font-size: 15px; font-weight: 900; text-transform: uppercase;
+            background: var(--bg); color: var(--text);
+            border-radius: 2px;
         }
-        .tile[data-state="correct"] { background-color: var(--correct); border-color: var(--correct); }
-        .tile[data-state="present"] { background-color: var(--present); border-color: var(--present); }
-        .tile[data-state="absent"] { background-color: var(--absent); border-color: var(--absent); }
+        .tile[data-state="correct"] { background-color: var(--correct); border-color: var(--correct); color: #fff; }
+        .tile[data-state="present"] { background-color: var(--present); border-color: var(--present); color: #fff; }
+        .tile[data-state="absent"] { background-color: var(--absent); border-color: var(--absent); color: #fff; }
         .tile[data-state="tbd"] { border-color: #565758; }
         .row.invalid .tile { color: var(--invalid); border-color: var(--invalid); }
 
         #nav-dots {
-            height: var(--nav-h); display: flex; gap: 8px; align-items: center; justify-content: center;
+            height: var(--nav-h); display: flex; gap: 10px; align-items: center; justify-content: center;
             background: var(--bg); flex-shrink: 0;
         }
-        .dot { width: 4px; height: 4px; border-radius: 50%; background: #333; }
-        .dot.active { background: #fff; transform: scale(1.2); }
+        .dot { width: 5px; height: 5px; border-radius: 50%; background: #333; transition: all 0.2s; }
+        .dot.active { background: #fff; transform: scale(1.3); }
 
         #dock {
             height: var(--dock-h); flex-shrink: 0;
             background: var(--bg); border-top: 1px solid var(--border);
-            padding-bottom: 5px; /* Extra buffer above accessory bar */
+            padding-bottom: 44px; /* Explicitly leave space for the Accessory Bar */
         }
         .keymap {
-            display: grid; grid-template-columns: repeat(10, 1fr); gap: 1px;
-            padding: 2px; max-width: 430px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px;
+            padding: 4px; max-width: 430px; margin: 0 auto;
         }
         .key {
-            height: 28px; border-radius: 3px; background: #818384;
+            height: 32px; border-radius: 4px; background: #818384;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.7rem; font-weight: bold;
+            font-size: 0.8rem; font-weight: 900; color: #fff;
         }
         .key[data-state="correct"] { background-color: var(--correct); }
         .key[data-state="present"] { background-color: var(--present); }
@@ -104,13 +110,13 @@
         #hidden-input { position: absolute; opacity: 0; pointer-events: none; left: -9999px; }
         #message {
             position: fixed; top: 12%; left: 50%; transform: translateX(-50%);
-            background: white; color: black; padding: 6px 12px; border-radius: 4px;
-            font-weight: bold; z-index: 9999; display: none; font-size: 0.65rem;
+            background: white; color: black; padding: 10px 20px; border-radius: 6px;
+            font-weight: 900; z-index: 9999; display: none; font-size: 0.8rem; box-shadow: 0 4px 20px rgba(0,0,0,0.6);
         }
     </style>
 </head>
 <body onclick="focusInput()">
-    <div id="safe-top"></div> <!-- Clears status icons/Dynamic Island -->
+    <div id="safe-top"></div>
     <header>
         <h1 id="mode-label">DAILY OCTORDLE</h1>
         <div class="btn-row">
@@ -133,13 +139,25 @@
     <div id="message"></div>
 
     <script>
-        let SOLUTIONS = [], ALLOWED = [], targetWords = [], boardStates = [], currentScreenIdx = 0, globalGuessCount = 0, currentGuess = "", isDaily = true, dailySeed = 0;
+        let SOLUTIONS = [], ALL_ALLOWED = [], targetWords = [], boardStates = [], currentScreenIdx = 0, globalGuessCount = 0, currentGuess = "", isDaily = true, dailySeed = 0;
 
         async function load() {
-            const [s, a] = await Promise.all([fetch('shuffled_real_wordles.txt'), fetch('official_allowed_guesses.txt')]);
-            SOLUTIONS = (await s.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
-            ALLOWED = (await a.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
-            startDaily();
+            try {
+                const [s, a] = await Promise.all([fetch('shuffled_real_wordles.txt'), fetch('official_allowed_guesses.txt')]);
+                SOLUTIONS = (await s.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
+                const extraAllowed = (await a.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
+                
+                // MERGE SOLUTIONS into ALL_ALLOWED to fix "CIGAR" bug
+                ALL_ALLOWED = Array.from(new Set([...SOLUTIONS, ...extraAllowed]));
+                console.log("Dictionary Loaded. Solutions:", SOLUTIONS.length, "Total Allowed:", ALL_ALLOWED.length);
+                
+                startDaily();
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                SOLUTIONS = ["APPLE", "CIGAR", "BRAIN", "BREAD", "BRUSH", "CHAIR", "CHEST", "CHORD"];
+                ALL_ALLOWED = SOLUTIONS;
+                startDaily();
+            }
         }
 
         function init(seed, isNew = false) {
@@ -159,8 +177,7 @@
                     const box = document.createElement('div');
                     box.className = 'board-box';
                     const grid = document.createElement('div');
-                    grid.className = 'grid';
-                    grid.id = `board-${idx}`;
+                    grid.className = 'grid'; grid.id = `board-${idx}`;
                     for(let r=0; r<13; r++) {
                         const row = document.createElement('div');
                         row.className = 'row';
@@ -176,9 +193,7 @@
                 }
                 slider.appendChild(screen);
                 const dot = document.createElement('div');
-                dot.className = 'dot';
-                dot.id = `dot-${s}`;
-                dots.appendChild(dot);
+                dot.className = 'dot'; dot.id = `dot-${s}`; dots.appendChild(dot);
             }
             if (isDaily && !isNew) loadState();
             initTray(); updateUI(); 
@@ -220,15 +235,15 @@
         function updateTray() {
             "QWERTYUIOPASDFGHJKLZXCVBNM".split('').forEach(l => {
                 const k = document.getElementById(`key-${l}`);
-                let b = "";
+                let best = "";
                 for(let i=0; i<8; i++) {
-                    const t = targetWords[i];
+                    const target = targetWords[i];
                     boardStates[i].guesses.forEach(g => {
-                        const f = getFeedback(g, t);
-                        for(let c=0; c<5; c++) { if(g[c] === l) { if(f[c] === 'correct') b = 'correct'; else if(f[c] === 'present' && b !== 'correct') b = 'present'; else if(b === "") b = 'absent'; } }
+                        const feedback = getFeedback(g, target);
+                        for(let c=0; c<5; c++) { if(g[c] === l) { if(feedback[c] === 'correct') best = 'correct'; else if(feedback[c] === 'present' && best !== 'correct') best = 'present'; else if(best === "") best = 'absent'; } }
                     });
                 }
-                k.setAttribute('data-state', b);
+                k.setAttribute('data-state', best);
             });
         }
 
@@ -244,7 +259,7 @@
         input.addEventListener('input', () => { currentGuess = input.value.toUpperCase(); updateUI(); });
         input.addEventListener('keydown', (e) => {
             if(e.key === 'Enter' && currentGuess.length === 5) {
-                if(!ALLOWED.includes(currentGuess)) { showInvalid(); return; }
+                if(!ALL_ALLOWED.includes(currentGuess)) { showInvalid(); return; }
                 const g = currentGuess;
                 for(let i=0; i<8; i++) { if(!boardStates[i].solved) { boardStates[i].guesses.push(g); if(g === targetWords[i]) boardStates[i].solved = true; } }
                 globalGuessCount++; currentGuess = ""; input.value = ""; if(isDaily) saveState(); updateUI();
@@ -271,9 +286,9 @@
         document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
         document.addEventListener('touchend', e => { const diff = touchStartX - e.changedTouches[0].screenX; if(Math.abs(diff) > 40) { if(diff > 0 && currentScreenIdx < 3) currentScreenIdx++; else if(diff < 0 && currentScreenIdx > 0) currentScreenIdx--; updateUI(); } }, false);
 
-        function saveState() { localStorage.setItem('octordle_v4_save', JSON.stringify({ seed: dailySeed, guesses: boardStates.map(b => b.guesses), count: globalGuessCount })); }
+        function saveState() { localStorage.setItem('octordle_v4_final', JSON.stringify({ seed: dailySeed, guesses: boardStates.map(b => b.guesses), count: globalGuessCount })); }
         function loadState() {
-            const saved = localStorage.getItem('octordle_v4_save');
+            const saved = localStorage.getItem('octordle_v4_final');
             if(saved) {
                 const s = JSON.parse(saved);
                 if(s.seed === dailySeed) {
