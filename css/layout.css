@@ -8,22 +8,29 @@ body {
     background-color: #000; /* Black background for 'outside' the phone */
     margin: 0; padding: 0;
     width: 100vw; height: 100dvh;
-    display: flex; justify-content: center; align-items: center;
     overflow: hidden;
+    display: grid;
+    place-items: center; /* Robust centering for desktop */
 }
 
 #app-shell {
     background-color: var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    width: 100%;
-    height: 100%;
-    max-width: 430px; /* iPhone 14/15 Pro width */
-    max-height: 932px; /* iPhone 15 Pro Max height as a safe limit */
+    width: 100%; height: 100%;
     display: flex; flex-direction: column;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+}
+
+/* Desktop Centering Constraints */
+@media (min-width: 500px) {
+    #app-shell {
+        max-width: 430px;
+        max-height: 932px;
+        box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        border-radius: 40px; 
+    }
 }
 
 #safe-top {
@@ -32,49 +39,39 @@ body {
     background: var(--bg);
 }
 
-
 header {
     height: var(--header-h);
     flex-shrink: 0;
     background: #1a1a1b;
     border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between;
     padding: 0 12px;
 }
 
 header h1 {
-    font-size: 0.9rem;
-    margin: 0;
-    font-weight: 900;
-    letter-spacing: 1px;
+    font-size: 0.9rem; margin: 0; font-weight: 900; letter-spacing: 1px;
 }
 
 #main-container {
-    /* flex-grow: 1; Removed to keep layout compact/up */
-    display: flex;
-    flex-direction: column;
+    flex: 0 1 auto; /* Don't grow, but do shrink if space is tight */
+    display: flex; flex-direction: column;
     overflow: hidden;
     background: var(--bg);
+    justify-content: flex-start;
 }
 
 #nav-dots {
     height: var(--nav-h);
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg);
-    flex-shrink: 0;
+    display: flex; gap: 10px; align-items: center; justify-content: center;
+    background: var(--bg); flex-shrink: 0;
 }
 
 #dock {
-    height: var(--dock-h);
+    height: auto; /* Allow height to be defined by content/padding */
     flex-shrink: 0;
     background: var(--bg);
     border-top: 1px solid var(--border);
-    padding-bottom: 44px;
+    padding-bottom: 44px; /* Maintain safe area for accessory bar */
 }
 
 #message {

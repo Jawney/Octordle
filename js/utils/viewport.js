@@ -3,10 +3,13 @@ export function updateViewport() {
     const shell = document.getElementById('app-shell');
     if (shell) {
         shell.style.height = v.height + "px";
-        // On desktop, we don't want to offset the shell vertically 
-        // unless we're simulating the keyboard.
-        if (window.ontouchstart !== undefined) {
+        
+        // On iOS, if the keyboard is open (v.offsetTop > 0), 
+        // we move the shell to match the viewport's offset.
+        if (v.offsetTop > 0) {
             shell.style.top = v.offsetTop + "px";
+        } else {
+            shell.style.top = "0";
         }
     }
     window.scrollTo(0, 0);
