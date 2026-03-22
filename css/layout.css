@@ -52,7 +52,7 @@ header h1 {
 }
 
 #main-container {
-    flex-grow: 1;
+    /* flex-grow: 1; Removed to keep layout compact/up */
     display: flex;
     flex-direction: column;
     overflow: hidden;
