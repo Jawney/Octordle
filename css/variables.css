@@ -1,0 +1,17 @@
+:root {
+    --bg: #121213;
+    --text: #ffffff;
+    --correct: #538d4e;
+    --present: #b59f3b;
+    --absent: #3a3a3c;
+    --invalid: #e12d2d;
+    --border: #3a3a3c;
+    --tile-text: #ffffff;
+
+    /* iPhone 14/15 Pro Specifics */
+    --safe-top: 47px;
+    --header-h: 40px;
+    --dock-h: 110px;
+    --nav-h: 15px;
+    --row-h: 27px;
+}

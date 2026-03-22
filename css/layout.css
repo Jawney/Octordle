@@ -1,0 +1,94 @@
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+}
+
+body {
+    background-color: #000; /* Black background for 'outside' the phone */
+    margin: 0; padding: 0;
+    width: 100vw; height: 100dvh;
+    display: flex; justify-content: center; align-items: center;
+    overflow: hidden;
+}
+
+#app-shell {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    width: 100%;
+    height: 100%;
+    max-width: 430px; /* iPhone 14/15 Pro width */
+    max-height: 932px; /* iPhone 15 Pro Max height as a safe limit */
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 40px rgba(0,0,0,0.8);
+}
+
+#safe-top {
+    height: var(--safe-top);
+    flex-shrink: 0;
+    background: var(--bg);
+}
+
+
+header {
+    height: var(--header-h);
+    flex-shrink: 0;
+    background: #1a1a1b;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+}
+
+header h1 {
+    font-size: 0.9rem;
+    margin: 0;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+#main-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+}
+
+#nav-dots {
+    height: var(--nav-h);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    flex-shrink: 0;
+}
+
+#dock {
+    height: var(--dock-h);
+    flex-shrink: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding-bottom: 44px;
+}
+
+#message {
+    position: fixed;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    color: black;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 900;
+    z-index: 9999;
+    display: none;
+    font-size: 0.8rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}

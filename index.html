@@ -3,306 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Octordle Pro v5</title>
+    <title>Octordle Pro Modular</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <style>
-        :root {
-            --bg: #121213;
-            --text: #ffffff;
-            --correct: #538d4e;
-            --present: #b59f3b;
-            --absent: #3a3a3c;
-            --invalid: #e12d2d;
-            --border: #3a3a3c;
-            --tile-text: #ffffff; /* High contrast white text on colors */
-            
-            /* iPhone 14/15 Pro Specifics */
-            --safe-top: 47px;
-            --header-h: 40px;
-            --dock-h: 110px; /* High enough to clear the 44px Accessory Bar */
-            --nav-h: 15px;
-            --row-h: 27px; /* Increased to fill the black space */
-        }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: none; }
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0; padding: 0;
-            width: 100vw; height: 100dvh;
-            display: flex; flex-direction: column;
-            overflow: hidden; position: fixed;
-            top: 0; left: 0;
-        }
-        #safe-top { height: var(--safe-top); flex-shrink: 0; background: var(--bg); }
-        header {
-            height: var(--header-h); flex-shrink: 0;
-            background: #1a1a1b; border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 12px;
-        }
-        header h1 { font-size: 0.9rem; margin: 0; font-weight: 900; letter-spacing: 1px; }
-        .btn-row { display: flex; gap: 6px; }
-        .btn { 
-            background: #3a3a3c; border: 1.5px solid #555; color: white; 
-            padding: 3px 10px; border-radius: 5px; font-size: 0.65rem; font-weight: 800; 
-            text-transform: uppercase;
-        }
-        .btn.active { background: var(--correct); border-color: var(--correct); }
-
-        #main-container {
-            flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;
-            background: var(--bg);
-        }
-        #board-slider {
-            width: 100%; height: 100%; display: flex;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .screen-pair {
-            flex-shrink: 0; width: 100%; height: 100%;
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 10px; padding: 6px 10px; align-items: start;
-        }
-        .board-box {
-            background: #1a1a1b; border: 1px solid #333; border-radius: 4px; padding: 2px;
-        }
-        .grid { display: grid; grid-template-rows: repeat(13, var(--row-h)); gap: 2px; }
-        .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; height: var(--row-h); }
-        .tile {
-            border: 2px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 15px; font-weight: 900; text-transform: uppercase;
-            background: var(--bg); color: var(--text);
-            border-radius: 2px;
-        }
-        .tile[data-state="correct"] { background-color: var(--correct); border-color: var(--correct); color: #fff; }
-        .tile[data-state="present"] { background-color: var(--present); border-color: var(--present); color: #fff; }
-        .tile[data-state="absent"] { background-color: var(--absent); border-color: var(--absent); color: #fff; }
-        .tile[data-state="tbd"] { border-color: #565758; }
-        .row.invalid .tile { color: var(--invalid); border-color: var(--invalid); }
-
-        #nav-dots {
-            height: var(--nav-h); display: flex; gap: 10px; align-items: center; justify-content: center;
-            background: var(--bg); flex-shrink: 0;
-        }
-        .dot { width: 5px; height: 5px; border-radius: 50%; background: #333; transition: all 0.2s; }
-        .dot.active { background: #fff; transform: scale(1.3); }
-
-        #dock {
-            height: var(--dock-h); flex-shrink: 0;
-            background: var(--bg); border-top: 1px solid var(--border);
-            padding-bottom: 44px; /* Explicitly leave space for the Accessory Bar */
-        }
-        .keymap {
-            display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px;
-            padding: 4px; max-width: 430px; margin: 0 auto;
-        }
-        .key {
-            height: 32px; border-radius: 4px; background: #818384;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.8rem; font-weight: 900; color: #fff;
-        }
-        .key[data-state="correct"] { background-color: var(--correct); }
-        .key[data-state="present"] { background-color: var(--present); }
-        .key[data-state="absent"] { background-color: var(--absent); opacity: 0.3; }
-
-        #hidden-input { position: absolute; opacity: 0; pointer-events: none; left: -9999px; }
-        #message {
-            position: fixed; top: 12%; left: 50%; transform: translateX(-50%);
-            background: white; color: black; padding: 10px 20px; border-radius: 6px;
-            font-weight: 900; z-index: 9999; display: none; font-size: 0.8rem; box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-        }
-    </style>
+    
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components/board.css">
+    <link rel="stylesheet" href="css/components/keyboard.css">
 </head>
-<body onclick="focusInput()">
-    <div id="safe-top"></div>
-    <header>
-        <h1 id="mode-label">DAILY OCTORDLE</h1>
-        <div class="btn-row">
-            <button class="btn" id="btn-daily" onclick="startDaily()">DAILY</button>
-            <button class="btn" id="btn-new" onclick="startNewGame()">NEW</button>
+<body>
+    <div id="app-shell">
+        <div id="safe-top"></div>
+        <header>
+            <h1 id="mode-label">DAILY OCTORDLE</h1>
+        </header>
+
+        <div id="main-container">
+            <div id="board-slider"></div>
         </div>
-    </header>
 
-    <div id="main-container">
-        <div id="board-slider"></div>
+        <div id="nav-dots"></div>
+
+        <div id="dock">
+            <div class="keymap" id="keymap"></div>
+            <input type="text" id="hidden-input" maxlength="5" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text">
+        </div>
+
+        <div id="message"></div>
     </div>
 
-    <div id="nav-dots"></div>
-
-    <div id="dock">
-        <div class="keymap" id="keymap"></div>
-        <input type="text" id="hidden-input" maxlength="5" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="text">
-    </div>
-
-    <div id="message"></div>
-
-    <script>
-        let SOLUTIONS = [], ALL_ALLOWED = [], targetWords = [], boardStates = [], currentScreenIdx = 0, globalGuessCount = 0, currentGuess = "", isDaily = true, dailySeed = 0;
-
-        async function load() {
-            try {
-                const [s, a] = await Promise.all([fetch('shuffled_real_wordles.txt'), fetch('official_allowed_guesses.txt')]);
-                SOLUTIONS = (await s.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
-                const extraAllowed = (await a.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
-                
-                // MERGE SOLUTIONS into ALL_ALLOWED to fix "CIGAR" bug
-                ALL_ALLOWED = Array.from(new Set([...SOLUTIONS, ...extraAllowed]));
-                console.log("Dictionary Loaded. Solutions:", SOLUTIONS.length, "Total Allowed:", ALL_ALLOWED.length);
-                
-                startDaily();
-            } catch (err) {
-                console.error("Fetch Error:", err);
-                SOLUTIONS = ["APPLE", "CIGAR", "BRAIN", "BREAD", "BRUSH", "CHAIR", "CHEST", "CHORD"];
-                ALL_ALLOWED = SOLUTIONS;
-                startDaily();
-            }
-        }
-
-        function init(seed, isNew = false) {
-            const slider = document.getElementById('board-slider'), dots = document.getElementById('nav-dots');
-            slider.innerHTML = ''; dots.innerHTML = '';
-            targetWords = []; boardStates = []; globalGuessCount = 0; currentGuess = ""; currentScreenIdx = 0;
-            const rand = mulberry32(seed);
-            for(let i=0; i<8; i++) {
-                targetWords.push(SOLUTIONS[Math.floor(rand() * SOLUTIONS.length)]);
-                boardStates.push({ guesses: [], solved: false });
-            }
-            for(let s=0; s<4; s++) {
-                const screen = document.createElement('div');
-                screen.className = 'screen-pair';
-                for(let b=0; b<2; b++) {
-                    const idx = s*2 + b;
-                    const box = document.createElement('div');
-                    box.className = 'board-box';
-                    const grid = document.createElement('div');
-                    grid.className = 'grid'; grid.id = `board-${idx}`;
-                    for(let r=0; r<13; r++) {
-                        const row = document.createElement('div');
-                        row.className = 'row';
-                        for(let c=0; c<5; c++) {
-                            const t = document.createElement('div');
-                            t.className = 'tile';
-                            row.appendChild(t);
-                        }
-                        grid.appendChild(row);
-                    }
-                    box.appendChild(grid);
-                    screen.appendChild(box);
-                }
-                slider.appendChild(screen);
-                const dot = document.createElement('div');
-                dot.className = 'dot'; dot.id = `dot-${s}`; dots.appendChild(dot);
-            }
-            if (isDaily && !isNew) loadState();
-            initTray(); updateUI(); 
-            setTimeout(() => { updateViewport(); focusInput(); }, 300);
-        }
-
-        function initTray() {
-            const tray = document.getElementById('keymap');
-            tray.innerHTML = '';
-            "QWERTYUIOPASDFGHJKLZXCVBNM".split('').forEach(l => {
-                const k = document.createElement('div');
-                k.className = 'key'; k.id = `key-${l}`; k.innerText = l; tray.appendChild(k);
-            });
-        }
-
-        function updateUI() {
-            document.getElementById('board-slider').style.transform = `translateX(-${currentScreenIdx * 100}%)`;
-            document.getElementById('mode-label').innerText = isDaily ? "DAILY OCTORDLE" : "PRACTICE OCTORDLE";
-            document.getElementById('btn-daily').classList.toggle('active', isDaily);
-            document.getElementById('btn-new').classList.toggle('active', !isDaily);
-            for(let s=0; s<4; s++) document.getElementById(`dot-${s}`).classList.toggle('active', s === currentScreenIdx);
-            for(let i=0; i<8; i++) {
-                const grid = document.getElementById(`board-${i}`), state = boardStates[i];
-                for(let r=0; r<13; r++) {
-                    const row = grid.children[r], g = state.guesses[r];
-                    if(g) {
-                        const feedback = getFeedback(g, targetWords[i]);
-                        for(let c=0; c<5; c++) { row.children[c].innerText = g[c]; row.children[c].setAttribute('data-state', feedback[c]); }
-                    } else if(r === globalGuessCount && !state.solved) {
-                        for(let c=0; c<5; c++) { row.children[c].innerText = currentGuess[c] || ""; row.children[c].setAttribute('data-state', currentGuess[c] ? 'tbd' : 'empty'); }
-                    } else {
-                        for(let c=0; c<5; c++) { row.children[c].innerText = ""; row.children[c].setAttribute('data-state', 'empty'); }
-                    }
-                }
-            }
-            updateTray();
-        }
-
-        function updateTray() {
-            "QWERTYUIOPASDFGHJKLZXCVBNM".split('').forEach(l => {
-                const k = document.getElementById(`key-${l}`);
-                let best = "";
-                for(let i=0; i<8; i++) {
-                    const target = targetWords[i];
-                    boardStates[i].guesses.forEach(g => {
-                        const feedback = getFeedback(g, target);
-                        for(let c=0; c<5; c++) { if(g[c] === l) { if(feedback[c] === 'correct') best = 'correct'; else if(feedback[c] === 'present' && best !== 'correct') best = 'present'; else if(best === "") best = 'absent'; } }
-                    });
-                }
-                k.setAttribute('data-state', best);
-            });
-        }
-
-        function getFeedback(g, t) {
-            const r = new Array(5).fill('absent'), ta = t.split(''), ga = g.split('');
-            for(let i=0; i<5; i++) { if(ga[i] === ta[i]) { r[i] = 'correct'; ta[i] = null; ga[i] = null; } }
-            for(let i=0; i<5; i++) { if(ga[i] && ta.includes(ga[i])) { r[i] = 'present'; ta[ta.indexOf(ga[i])] = null; } }
-            return r;
-        }
-
-        function focusInput() { document.getElementById('hidden-input').focus(); }
-        const input = document.getElementById('hidden-input');
-        input.addEventListener('input', () => { currentGuess = input.value.toUpperCase(); updateUI(); });
-        input.addEventListener('keydown', (e) => {
-            if(e.key === 'Enter' && currentGuess.length === 5) {
-                if(!ALL_ALLOWED.includes(currentGuess)) { showInvalid(); return; }
-                const g = currentGuess;
-                for(let i=0; i<8; i++) { if(!boardStates[i].solved) { boardStates[i].guesses.push(g); if(g === targetWords[i]) boardStates[i].solved = true; } }
-                globalGuessCount++; currentGuess = ""; input.value = ""; if(isDaily) saveState(); updateUI();
-            }
-        });
-
-        function showInvalid() {
-            document.querySelectorAll('.screen-pair')[currentScreenIdx].querySelectorAll('.row').forEach(row => { if(row === row.parentElement.children[globalGuessCount]) { row.classList.add('invalid'); setTimeout(() => row.classList.remove('invalid'), 800); } });
-            showMessage("NOT IN WORD LIST");
-        }
-
-        function updateViewport() {
-            const v = window.visualViewport;
-            document.body.style.height = v.height + "px";
-            document.body.style.top = v.offsetTop + "px";
-            window.scrollTo(0, 0);
-        }
-        window.visualViewport.addEventListener('resize', updateViewport);
-        window.visualViewport.addEventListener('scroll', updateViewport);
-        
-        function showMessage(txt) { const m = document.getElementById('message'); m.innerText = txt; m.style.display = 'block'; setTimeout(() => m.style.display = 'none', 2000); }
-
-        let touchStartX = 0;
-        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
-        document.addEventListener('touchend', e => { const diff = touchStartX - e.changedTouches[0].screenX; if(Math.abs(diff) > 40) { if(diff > 0 && currentScreenIdx < 3) currentScreenIdx++; else if(diff < 0 && currentScreenIdx > 0) currentScreenIdx--; updateUI(); } }, false);
-
-        function saveState() { localStorage.setItem('octordle_v4_final', JSON.stringify({ seed: dailySeed, guesses: boardStates.map(b => b.guesses), count: globalGuessCount })); }
-        function loadState() {
-            const saved = localStorage.getItem('octordle_v4_final');
-            if(saved) {
-                const s = JSON.parse(saved);
-                if(s.seed === dailySeed) {
-                    globalGuessCount = s.count;
-                    for(let i=0; i<8; i++) { boardStates[i].guesses = s.guesses[i] || []; if(boardStates[i].guesses.includes(targetWords[i])) boardStates[i].solved = true; }
-                }
-            }
-        }
-
-        function mulberry32(a) { return function() { var t = a += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; } }
-        function startDaily() { isDaily = true; const d = new Date(); dailySeed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(); init(dailySeed); }
-        function startNewGame() { isDaily = false; init(Math.floor(Math.random() * 1000000), true); }
-
-        load();
-    </script>
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>

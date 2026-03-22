@@ -1,0 +1,12 @@
+{
+  "name": "octordle-modular",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/engine.test.js",
+    "serve": "npx serve ."
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}

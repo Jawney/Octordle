@@ -1,0 +1,40 @@
+.keymap {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 2px;
+    padding: 4px;
+    max-width: 430px;
+    margin: 0 auto;
+}
+
+.key {
+    height: 32px;
+    border-radius: 4px;
+    background: #818384;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #fff;
+}
+
+.key[data-state="correct"] {
+    background-color: var(--correct);
+}
+
+.key[data-state="present"] {
+    background-color: var(--present);
+}
+
+.key[data-state="absent"] {
+    background-color: var(--absent);
+    opacity: 0.3;
+}
+
+#hidden-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    left: -9999px;
+}
