@@ -9,8 +9,7 @@ body {
     margin: 0; padding: 0;
     width: 100vw; height: 100dvh;
     overflow: hidden;
-    display: grid;
-    place-items: center; /* Robust centering for desktop */
+    /* Grid centering moved to media query to avoid mobile issues */
 }
 
 #app-shell {
@@ -20,11 +19,15 @@ body {
     width: 100%; height: 100%;
     display: flex; flex-direction: column;
     overflow: hidden;
-    position: relative;
+    position: relative; /* Essential for viewport offsetting */
 }
 
 /* Desktop Centering Constraints */
 @media (min-width: 500px) {
+    body {
+        display: grid;
+        place-items: center;
+    }
     #app-shell {
         max-width: 430px;
         max-height: 932px;
