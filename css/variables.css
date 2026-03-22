@@ -8,10 +8,13 @@
     --border: #3a3a3c;
     --tile-text: #ffffff;
 
-    /* iPhone 14/15 Pro Specifics */
+    /* iPhone 14/15 Pro Hard-Coded Dimensions */
     --safe-top: 47px;
     --header-h: 40px;
-    --dock-h: 110px;
-    --nav-h: 15px;
     --row-h: 27px;
+    --row-gap: 2px;
+    /* 13 rows * 27px + 12 gaps * 2px = 375px */
+    --board-h: 375px; 
+    --nav-h: 15px;
+    --dock-h: 110px;
 }
