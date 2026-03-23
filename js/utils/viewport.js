@@ -1,6 +1,12 @@
 export function updateViewport() {
-    // Only prevent the OS from scrolling when the keyboard opens.
-    // We no longer manually resize the shell or move it.
+    // Only resize the shell if we're on a mobile device (width < 500px)
+    if (window.innerWidth < 500) {
+        const v = window.visualViewport;
+        const shell = document.getElementById('app-shell');
+        if (shell) {
+            shell.style.height = v.height + "px";
+        }
+    }
     window.scrollTo(0, 0);
 }
 

@@ -19,6 +19,17 @@ class App {
         });
 
         this.init();
+        this.displayVersion();
+    }
+
+    displayVersion() {
+        const versionString = "v1.3.0"; 
+        const display = document.getElementById('version-display');
+        if (display) {
+            display.innerText = versionString;
+            console.log("App Version:", versionString);
+        }
+        document.title = `Octordle Pro Modular ${versionString}`;
     }
 
     async init() {
@@ -136,7 +147,11 @@ class App {
     }
 
     updateUI() {
-        document.getElementById('mode-label').innerText = this.state.isDaily ? "DAILY OCTORDLE" : "PRACTICE OCTORDLE";
+        const modeLabel = document.getElementById('mode-label');
+        if (modeLabel) {
+            // Update only the text node, not the whole innerHTML which contains the version
+            modeLabel.childNodes[0].textContent = (this.state.isDaily ? "DAILY" : "PRACTICE") + " OCTORDLE ";
+        }
         this.boardView.update();
         this.keyboard.update();
     }

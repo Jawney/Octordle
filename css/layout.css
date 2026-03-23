@@ -7,10 +7,8 @@
 body {
     background-color: #000;
     margin: 0; padding: 0;
-    width: 100vw; height: 100vh;
+    width: 100vw; height: 100dvh;
     overflow: hidden;
-    position: fixed; /* Keep it locked */
-    top: 0; left: 0;
 }
 
 #app-shell {
@@ -22,6 +20,21 @@ body {
     overflow: hidden;
     position: absolute;
     top: 0; left: 0;
+}
+
+/* Desktop Centering Constraint */
+@media (min-width: 500px) {
+    body {
+        display: grid;
+        place-items: center;
+    }
+    #app-shell {
+        max-width: 430px;
+        max-height: 932px;
+        box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        border-radius: 40px;
+        position: relative; /* Break from top-pin for desktop grid centering */
+    }
 }
 
 #hidden-input {
@@ -66,7 +79,8 @@ header {
     flex-shrink: 0;
     background: var(--bg);
     border-top: 1px solid var(--border);
-    padding-bottom: 44px; /* Still clear the bar */
+    padding-bottom: 44px; /* Space for iPhone Accessory Bar */
+    box-sizing: border-box;
 }
 
 #message {
