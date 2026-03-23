@@ -22,29 +22,6 @@ body {
     top: 0; left: 0;
 }
 
-/* Desktop Centering Constraint */
-@media (min-width: 500px) {
-    body {
-        display: grid;
-        place-items: center;
-    }
-    #app-shell {
-        max-width: 430px;
-        max-height: 932px;
-        box-shadow: 0 0 40px rgba(0,0,0,0.8);
-        border-radius: 40px;
-        position: relative; /* Break from top-pin for desktop grid centering */
-    }
-}
-
-#hidden-input {
-    position: absolute;
-    top: 0; left: 0;
-    width: 1px; height: 1px;
-    opacity: 0; pointer-events: none;
-    z-index: -1;
-}
-
 #safe-top {
     height: var(--safe-top);
     flex-shrink: 0;
@@ -65,6 +42,7 @@ header {
     display: flex; flex-direction: column;
     overflow: hidden;
     background: var(--bg);
+    justify-content: flex-start;
 }
 
 #nav-dots {
@@ -79,7 +57,7 @@ header {
     flex-shrink: 0;
     background: var(--bg);
     border-top: 1px solid var(--border);
-    padding-bottom: 44px; /* Space for iPhone Accessory Bar */
+    padding-bottom: 0; /* Clear padding to fit budget */
     box-sizing: border-box;
 }
 

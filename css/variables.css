@@ -8,14 +8,15 @@
     --border: #3a3a3c;
     --tile-text: #ffffff;
 
-    /* iPhone 14/15 Pro Hard-Coded Dimensions - Calibrated */
+    /* iPhone 15 Pro Max Pixel-Perfect Budget (480px visible area) */
     --safe-top: 47px;
     --header-h: 40px;
-    --row-h: 27px;
+    --row-h: 21px;
     --row-gap: 2px;
-    /* 13 rows * 27px + 12 gaps * 2px + buffers = 385px */
-    --board-h: 385px; 
-    --nav-h: 20px;
-    /* 3 rows of keys (100px) + 44px accessory bar + padding = 150px */
-    --dock-h: 150px;
+    /* (13 rows * 21px) + (12 gaps * 2px) + buffer = 298px */
+    --board-h: 298px; 
+    --nav-h: 15px;
+    --key-h: 24px;
+    /* (3 rows * 24px) + (2 gaps * 4px) = 80px */
+    --dock-h: 80px;
 }
