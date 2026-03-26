@@ -54,8 +54,7 @@ export class Menu {
             this.callbacks.resetDaily();
             this.toggle();
         });
-        resetDailyBtn.style.marginTop = 'auto'; // Push to bottom
-        resetDailyBtn.style.marginBottom = '30px'; // Add space below
+        resetDailyBtn.style.marginTop = '60px'; // Separate from modes, keep in visible area
         resetDailyBtn.style.background = '#8e1c1c'; // Dark red for "destructive" action
 
         this.overlay.appendChild(dailyBtn);
