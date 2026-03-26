@@ -8,13 +8,13 @@
     --border: #3a3a3c;
     --tile-text: #ffffff;
 
-    /* iPhone 15 Pro Max Pixel-Perfect Budget (480px visible area) */
+    /* iPhone 15 Pro Max Pixel-Perfect Budget (545px visible area) */
     --safe-top: 47px;
     --header-h: 40px;
-    --row-h: 21px;
+    --row-h: 26px;
     --row-gap: 2px;
-    /* (13 rows * 21px) + (12 gaps * 2px) + buffer = 298px */
-    --board-h: 298px; 
+    /* (13 rows * 26px) + (12 gaps * 2px) + buffer (1) = 363px */
+    --board-h: 363px; 
     --nav-h: 15px;
     --key-h: 24px;
     /* (3 rows * 24px) + (2 gaps * 4px) = 80px */
