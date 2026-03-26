@@ -23,7 +23,8 @@ class App {
     }
 
     displayVersion() {
-        const versionString = "v1.7.0"; 
+        const versionString = "v1.8.0"; 
+
         const display = document.getElementById('version-display');
         if (display) {
             display.innerText = versionString;

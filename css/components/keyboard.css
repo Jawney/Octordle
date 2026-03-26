@@ -31,7 +31,9 @@
 
 #hidden-input {
     position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    left: -9999px;
+    top: 0; left: 0;
+    width: 1px; height: 1px;
+    opacity: 0; pointer-events: none;
+    font-size: 16px; /* Stop iOS auto-zoom */
+    z-index: -1;
 }
