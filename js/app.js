@@ -16,10 +16,18 @@ class App {
 
         this.menu = new Menu({
             startDaily: () => this.startDaily(),
-            startPractice: () => this.startPractice()
+            startPractice: () => this.startPractice(),
+            resetDaily: () => this.resetDaily()
         });
 
         this.init();
+    }
+
+    resetDaily() {
+        if (confirm("Reset Daily Game? This will wipe your progress for today.")) {
+            this.state.clear();
+            this.startDaily();
+        }
     }
 
     async init() {

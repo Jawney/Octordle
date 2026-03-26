@@ -26,7 +26,8 @@ export class Menu {
         this.overlay = document.createElement('div');
         this.overlay.id = 'menu-overlay';
         this.overlay.style.cssText = `
-            position: absolute; top: 0; right: -250px; width: 250px; height: 100%;
+            position: absolute; top: var(--safe-top); right: -250px; width: 250px; 
+            height: calc(100% - var(--safe-top));
             background: #1a1a1b; z-index: 10000; transition: right 0.3s ease;
             box-shadow: -2px 0 10px rgba(0,0,0,0.5); padding-top: 60px;
             display: flex; flex-direction: column; gap: 20px;
@@ -49,9 +50,17 @@ export class Menu {
             this.callbacks.startPractice();
             this.toggle();
         });
+        const resetDailyBtn = this.createMenuButton('Reset Daily', () => {
+            this.callbacks.resetDaily();
+            this.toggle();
+        });
+        resetDailyBtn.style.marginTop = 'auto'; // Push to bottom
+        resetDailyBtn.style.marginBottom = '30px'; // Add space below
+        resetDailyBtn.style.background = '#8e1c1c'; // Dark red for "destructive" action
 
         this.overlay.appendChild(dailyBtn);
         this.overlay.appendChild(practiceBtn);
+        this.overlay.appendChild(resetDailyBtn);
         
         const shell = document.getElementById('app-shell');
         if (shell) shell.appendChild(this.overlay);

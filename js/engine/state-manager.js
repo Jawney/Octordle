@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'octordle_v5_modular';
+const STORAGE_KEY = 'daily-octordle';
 
 export class StateManager {
     constructor() {
@@ -38,6 +38,10 @@ export class StateManager {
                 }
             }
         }
+    }
+
+    clear() {
+        localStorage.removeItem(STORAGE_KEY);
     }
 
     reset(seed, isDaily) {
