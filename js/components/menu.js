@@ -8,20 +8,19 @@ export class Menu {
     createMenu() {
         const header = document.querySelector('header');
         
-        // Remove old buttons
-        const btnRow = header.querySelector('.btn-row');
-        if (btnRow) btnRow.remove();
+        // Remove old button if exists
+        const oldHamburger = document.getElementById('hamburger');
+        if (oldHamburger) oldHamburger.remove();
 
         // Create hamburger button
         const hamburger = document.createElement('button');
         hamburger.id = 'hamburger';
         hamburger.innerHTML = '&#9776;'; // Hamburger icon
-        hamburger.style.background = 'none';
-        hamburger.style.border = 'none';
-        hamburger.style.color = 'white';
-        hamburger.style.fontSize = '1.5rem';
-        hamburger.style.padding = '0 10px';
-        header.appendChild(hamburger);
+        hamburger.style.cssText = `
+            background: none; border: none; color: white;
+            font-size: 1.5rem; padding: 0 5px; cursor: pointer;
+        `;
+        header.appendChild(hamburger); // Appends to the end (right side)
 
         // Create overlay menu
         this.overlay = document.createElement('div');
