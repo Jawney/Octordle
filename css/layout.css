@@ -7,9 +7,9 @@
 body {
     background-color: #000;
     margin: 0; padding: 0;
-    width: 100vw; height: 100dvh;
+    width: 100vw; height: 100vh; /* Stable height: ignored the suggestion bar */
     overflow: hidden;
-    overscroll-behavior: none; /* Prevent bounce and jitters */
+    overscroll-behavior: none;
 }
 
 #app-shell {
