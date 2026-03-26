@@ -4,22 +4,31 @@ export class Keyboard {
     constructor(state) {
         this.state = state;
         this.tray = document.getElementById('keymap');
-        this.keys = "QWERTYUIOPASDFGHJKLZXCVBNM".split('');
+        this.rows = [
+            "QWERTYUIOP".split(''),
+            "ASDFGHJKL".split(''),
+            "ZXCVBNM".split('')
+        ];
     }
 
     init() {
         this.tray.innerHTML = '';
-        this.keys.forEach(l => {
-            const k = document.createElement('div');
-            k.className = 'key';
-            k.id = `key-${l}`;
-            k.innerText = l;
-            this.tray.appendChild(k);
+        this.rows.forEach(rowKeys => {
+            const row = document.createElement('div');
+            row.className = 'key-row';
+            rowKeys.forEach(l => {
+                const k = document.createElement('div');
+                k.className = 'key';
+                k.id = `key-${l}`;
+                k.innerText = l;
+                row.appendChild(k);
+            });
+            this.tray.appendChild(row);
         });
     }
 
     update() {
-        this.keys.forEach(l => {
+        this.rows.flat().forEach(l => {
             const k = document.getElementById(`key-${l}`);
             let best = "";
             

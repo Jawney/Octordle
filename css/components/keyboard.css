@@ -1,13 +1,21 @@
 .keymap {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 4px 2px; /* Increased vertical gap to 4px */
-    padding: 2px 4px; /* Reduced vertical padding */
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 2px 4px;
     max-width: 430px;
     margin: 0 auto;
 }
 
+.key-row {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+}
+
 .key {
+    flex: 1;
+    max-width: 40px; /* Prevent keys from becoming too wide */
     height: var(--key-h); /* 24px */
     border-radius: 4px;
     background: #818384;
@@ -15,18 +23,21 @@
     font-size: 0.75rem; font-weight: 900; color: #fff;
 }
 
-
 .key[data-state="correct"] {
     background-color: var(--correct);
+    opacity: 1;
 }
 
 .key[data-state="present"] {
     background-color: var(--present);
+    opacity: 1;
 }
 
 .key[data-state="absent"] {
     background-color: var(--absent);
-    opacity: 0.3;
+    opacity: 0.4;
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
 }
 
 #hidden-input {
