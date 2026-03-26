@@ -40,7 +40,7 @@ header {
 }
 
 header h1 {
-    font-size: 1.1rem; /* Restored to a larger, bolder size */
+    font-size: 1.3rem; /* Further increased for a larger, bolder look */
     margin: 0;
     font-weight: 900;
     letter-spacing: 1px;
