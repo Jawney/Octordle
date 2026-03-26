@@ -3,6 +3,7 @@ import { StateManager } from './engine/state-manager.js';
 import { mulberry32 } from './utils/random.js';
 import { BoardView } from './components/board-view.js';
 import { Keyboard } from './components/keyboard.js';
+import { SummaryView } from './components/summary-view.js';
 import { Menu } from './components/menu.js';
 import { initViewport, updateViewport, focusInput } from './utils/viewport.js';
 
@@ -11,6 +12,7 @@ class App {
         this.state = new StateManager();
         this.boardView = new BoardView(this.state);
         this.keyboard = new Keyboard(this.state);
+        this.summaryView = new SummaryView(this.state);
         this.dictionaries = { solutions: [], allAllowed: [] };
         this.version = "v1.8.0"; // Default fallback
 
@@ -61,28 +63,40 @@ class App {
     setupInput() {
         const input = document.getElementById('hidden-input');
         input.addEventListener('input', () => {
+            if (this.state.isFinished) {
+                input.value = "";
+                return;
+            }
             this.state.currentGuess = input.value.toUpperCase();
             this.updateUI();
         });
 
         input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && this.state.currentGuess.length === 5) {
-                this.submitGuess();
-            } else if (e.key === 'ArrowRight') {
+            if (e.key === 'ArrowRight') {
                 if (this.state.currentScreenIdx < 3) {
                     this.state.currentScreenIdx++;
                     this.updateUI();
                 }
+                return;
             } else if (e.key === 'ArrowLeft') {
                 if (this.state.currentScreenIdx > 0) {
                     this.state.currentScreenIdx--;
                     this.updateUI();
                 }
+                return;
+            }
+
+            if (this.state.isFinished) return;
+
+            if (e.key === 'Enter' && this.state.currentGuess.length === 5) {
+                this.submitGuess();
             }
         });
     }
 
     submitGuess() {
+        if (this.state.isFinished) return;
+
         const guess = this.state.currentGuess;
         if (!this.dictionaries.allAllowed.includes(guess)) {
             return;
@@ -165,7 +179,13 @@ class App {
             modeText.textContent = (this.state.isDaily ? "DAILY" : "PRACTICE") + " OCTORDLE";
         }
         this.boardView.update();
-        this.keyboard.update();
+        
+        if (this.state.isFinished) {
+            this.summaryView.update();
+        } else {
+            this.summaryView.hide();
+            this.keyboard.update();
+        }
     }
 }
 

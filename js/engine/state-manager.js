@@ -53,4 +53,10 @@ export class StateManager {
         this.boardStates = Array.from({ length: 8 }, () => ({ guesses: [], solved: false }));
         this.targetWords = [];
     }
+
+    get isFinished() {
+        const allSolved = this.boardStates.every(b => b.solved);
+        const outOfGuesses = this.globalGuessCount >= 13;
+        return allSolved || outOfGuesses;
+    }
 }
