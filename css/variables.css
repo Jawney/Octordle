@@ -11,9 +11,9 @@
     /* iPhone 15 Pro Max Pixel-Perfect Budget (545px visible area) */
     --safe-top: 47px;
     --header-h: 40px;
-    --row-h: 26px;
+    --row-h: 25px;
     --row-gap: 2px;
-    /* (13 rows * 26px) + (12 gaps * 2px) + buffer (1) = 363px */
+    /* (13 rows * 25px) + (12 gaps * 2px) + buffer (gaps and borders: 14) = 363px */
     --board-h: 363px; 
     --nav-h: 15px;
     --key-h: 24px;
