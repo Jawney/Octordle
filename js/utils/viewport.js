@@ -1,10 +1,15 @@
+let lastHeight = window.innerHeight;
+
 export function updateViewport() {
-    // Only resize the shell if we're on a mobile device (width < 500px)
     if (window.innerWidth < 500) {
         const v = window.visualViewport;
         const shell = document.getElementById('app-shell');
-        if (shell) {
+        
+        // Only trigger a resize if the height change is significant (> 20px)
+        // This prevents the 'flash' caused by the iOS suggestion bar jittering.
+        if (shell && Math.abs(v.height - lastHeight) > 20) {
             shell.style.height = v.height + "px";
+            lastHeight = v.height;
         }
     }
     window.scrollTo(0, 0);
