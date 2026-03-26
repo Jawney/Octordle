@@ -46,7 +46,7 @@ class App {
             display.innerText = this.version;
             console.log("App Version:", this.version);
         }
-        document.title = `Octordle Pro Modular ${this.version}`;
+        document.title = `Octordle ${this.version}`;
     }
 
     setupInput() {
