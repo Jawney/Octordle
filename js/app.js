@@ -42,6 +42,7 @@ class App {
         
         this.displayVersion();
         this.dictionaries = await loadDictionaries();
+        this.boardView.setAllowed(this.dictionaries.allAllowed);
         initViewport();
         this.setupInput();
         this.setupTouch();
@@ -84,7 +85,6 @@ class App {
     submitGuess() {
         const guess = this.state.currentGuess;
         if (!this.dictionaries.allAllowed.includes(guess)) {
-            this.showInvalid();
             return;
         }
 
@@ -108,15 +108,11 @@ class App {
     }
 
     showInvalid() {
-        this.boardView.showInvalid();
-        this.showMessage("NOT IN WORD LIST");
+        // Handled in BoardView.update()
     }
 
     showMessage(txt) {
-        const m = document.getElementById('message');
-        m.innerText = txt;
-        m.style.display = 'block';
-        setTimeout(() => m.style.display = 'none', 2000);
+        // No longer needed for invalid words
     }
 
     setupTouch() {

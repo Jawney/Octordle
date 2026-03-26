@@ -3,8 +3,13 @@ import { getFeedback } from '../engine/game-logic.js';
 export class BoardView {
     constructor(state) {
         this.state = state;
+        this.allAllowed = [];
         this.slider = document.getElementById('board-slider');
         this.dots = document.getElementById('nav-dots');
+    }
+
+    setAllowed(list) {
+        this.allAllowed = list;
     }
 
     init() {
@@ -52,6 +57,9 @@ export class BoardView {
         for (let s = 0; s < 4; s++) {
             document.getElementById(`dot-${s}`).classList.toggle('active', s === this.state.currentScreenIdx);
         }
+
+        const isGuessFull = this.state.currentGuess.length === 5;
+        const isGuessInvalid = isGuessFull && !this.allAllowed.includes(this.state.currentGuess);
         
         for (let i = 0; i < 8; i++) {
             const grid = document.getElementById(`board-${i}`);
@@ -62,6 +70,9 @@ export class BoardView {
                 const row = grid.children[r];
                 const guess = boardState.guesses[r];
                 
+                // Real-time invalid class toggle
+                row.classList.toggle('invalid', r === this.state.globalGuessCount && !boardState.solved && isGuessInvalid);
+
                 if (guess) {
                     const feedback = getFeedback(guess, target);
                     for (let c = 0; c < 5; c++) {
@@ -88,14 +99,6 @@ export class BoardView {
     }
 
     showInvalid() {
-        const currentScreen = this.slider.children[this.state.currentScreenIdx];
-        const boards = currentScreen.querySelectorAll('.grid');
-        boards.forEach(grid => {
-            const row = grid.children[this.state.globalGuessCount];
-            if (row) {
-                row.classList.add('invalid');
-                setTimeout(() => row.classList.remove('invalid'), 800);
-            }
-        });
+        // Handled in update()
     }
 }
