@@ -156,10 +156,9 @@ class App {
     }
 
     updateUI() {
-        const modeLabel = document.getElementById('mode-label');
-        if (modeLabel) {
-            // Update only the text node, not the whole innerHTML which contains the version
-            modeLabel.childNodes[0].textContent = (this.state.isDaily ? "DAILY" : "PRACTICE") + " OCTORDLE ";
+        const modeText = document.getElementById('mode-text');
+        if (modeText) {
+            modeText.textContent = (this.state.isDaily ? "DAILY" : "PRACTICE") + " OCTORDLE";
         }
         this.boardView.update();
         this.keyboard.update();

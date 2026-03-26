@@ -33,8 +33,30 @@ header {
     flex-shrink: 0;
     background: #1a1a1b;
     border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 0 12px;
+    position: relative; /* Base for centered absolute h1 */
+}
+
+header h1 {
+    font-size: 0.95rem; /* Slightly larger for legibility */
+    margin: 0;
+    font-weight: 900;
+    letter-spacing: 1px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    pointer-events: none; /* Let clicks pass through to menu if they overlap */
+}
+
+#hamburger {
+    z-index: 10; /* Ensure it stays above the absolute h1 */
 }
 
 #main-container {
