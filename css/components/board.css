@@ -73,15 +73,29 @@
     border-color: var(--invalid);
 }
 
+.dot-pair {
+    display: flex;
+    gap: 4px;
+    padding: 3px 5px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    align-items: center;
+}
+
+.dot-pair.active {
+    border-color: #fff; /* The box around the pair */
+    background: rgba(255, 255, 255, 0.1);
+}
+
 .dot {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: #333;
     transition: all 0.2s;
 }
 
-.dot.active {
-    background: #fff;
-    transform: scale(1.3);
+.dot[data-solved="true"] {
+    background: var(--correct);
 }

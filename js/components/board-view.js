@@ -20,6 +20,11 @@ export class BoardView {
             const screen = document.createElement('div');
             screen.className = 'screen-pair';
             
+            // Create a container for the pair of dots
+            const pairContainer = document.createElement('div');
+            pairContainer.className = 'dot-pair';
+            pairContainer.id = `pair-${s}`;
+
             for (let b = 0; b < 2; b++) {
                 const idx = s * 2 + b;
                 const box = document.createElement('div');
@@ -41,21 +46,31 @@ export class BoardView {
                 }
                 box.appendChild(grid);
                 screen.appendChild(box);
+
+                // Create a dot for each board inside the pair container
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.id = `dot-${idx}`;
+                pairContainer.appendChild(dot);
             }
             this.slider.appendChild(screen);
-            
-            const dot = document.createElement('div');
-            dot.className = 'dot';
-            dot.id = `dot-${s}`;
-            this.dots.appendChild(dot);
+            this.dots.appendChild(pairContainer);
         }
     }
 
     update() {
         this.slider.style.transform = `translateX(-${this.state.currentScreenIdx * 100}%)`;
         
+        // Update pairs and dots
         for (let s = 0; s < 4; s++) {
-            document.getElementById(`dot-${s}`).classList.toggle('active', s === this.state.currentScreenIdx);
+            const pair = document.getElementById(`pair-${s}`);
+            pair.classList.toggle('active', s === this.state.currentScreenIdx);
+            
+            for (let b = 0; b < 2; b++) {
+                const idx = s * 2 + b;
+                const dot = document.getElementById(`dot-${idx}`);
+                dot.setAttribute('data-solved', this.state.boardStates[idx].solved);
+            }
         }
 
         const isGuessFull = this.state.currentGuess.length === 5;
