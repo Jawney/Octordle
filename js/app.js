@@ -12,33 +12,41 @@ class App {
         this.boardView = new BoardView(this.state);
         this.keyboard = new Keyboard(this.state);
         this.dictionaries = { solutions: [], allAllowed: [] };
-        
+        this.version = "v1.8.0"; // Default fallback
+
         this.menu = new Menu({
             startDaily: () => this.startDaily(),
             startPractice: () => this.startPractice()
         });
 
         this.init();
-        this.displayVersion();
-    }
-
-    displayVersion() {
-        const versionString = "v1.8.0"; 
-
-        const display = document.getElementById('version-display');
-        if (display) {
-            display.innerText = versionString;
-            console.log("App Version:", versionString);
-        }
-        document.title = `Octordle Pro Modular ${versionString}`;
     }
 
     async init() {
+        // Fetch version from package.json
+        try {
+            const response = await fetch('package.json');
+            const pkg = await response.json();
+            this.version = `v${pkg.version}`;
+        } catch (e) {
+            console.warn("Could not fetch version from package.json, using fallback.");
+        }
+        
+        this.displayVersion();
         this.dictionaries = await loadDictionaries();
         initViewport();
         this.setupInput();
         this.setupTouch();
         this.startDaily();
+    }
+
+    displayVersion() {
+        const display = document.getElementById('version-display');
+        if (display) {
+            display.innerText = this.version;
+            console.log("App Version:", this.version);
+        }
+        document.title = `Octordle Pro Modular ${this.version}`;
     }
 
     setupInput() {
