@@ -33,6 +33,9 @@ export class Keyboard {
             let best = "";
             
             for (let i = 0; i < 8; i++) {
+                // SKIP boards that are already solved
+                if (this.state.boardStates[i].solved) continue;
+
                 const target = this.state.targetWords[i];
                 this.state.boardStates[i].guesses.forEach(g => {
                     const feedback = getFeedback(g, target);
