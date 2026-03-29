@@ -26,7 +26,7 @@ export class SummaryView {
                 font-weight: 900;
                 font-size: 0.85rem;
                 color: ${isSolved ? 'var(--correct)' : 'var(--invalid)'};
-                text-align: left;
+                text-align: center;
             `;
             summary.appendChild(item);
         });
