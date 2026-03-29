@@ -23,6 +23,22 @@ class App {
         });
 
         this.init();
+        this.setupMidnightWatcher();
+    }
+
+    setupMidnightWatcher() {
+        // Check every minute if the date has changed
+        setInterval(() => {
+            if (!this.state.isDaily) return;
+            
+            const now = new Date();
+            const currentSeed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+            
+            if (currentSeed !== this.state.dailySeed) {
+                console.log("Midnight detected! Resetting Daily game...");
+                this.startDaily();
+            }
+        }, 60000);
     }
 
     resetDaily() {

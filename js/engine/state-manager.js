@@ -36,6 +36,9 @@ export class StateManager {
                         this.boardStates[i].solved = true;
                     }
                 }
+            } else {
+                // Seed mismatch: It's a new day. Clear old progress.
+                this.clear();
             }
         }
     }
