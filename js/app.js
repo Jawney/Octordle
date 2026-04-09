@@ -1,11 +1,13 @@
 import { loadDictionaries } from './engine/dictionary.js';
 import { StateManager } from './engine/state-manager.js';
-import { mulberry32 } from './utils/random.js';
+import { seededShuffle } from './utils/random.js';
 import { BoardView } from './components/board-view.js';
 import { Keyboard } from './components/keyboard.js';
 import { SummaryView } from './components/summary-view.js';
 import { Menu } from './components/menu.js';
 import { initViewport, updateViewport, focusInput } from './utils/viewport.js';
+
+const EPOCH_DATE = new Date('2022-01-24T00:00:00Z');
 
 class App {
     constructor() {
@@ -13,7 +15,7 @@ class App {
         this.boardView = new BoardView(this.state);
         this.keyboard = new Keyboard(this.state);
         this.summaryView = new SummaryView(this.state);
-        this.dictionaries = { solutions: [], allAllowed: [] };
+        this.dictionaries = { classic: [], extreme: [], allAllowed: [] };
         this.version = "v1.8.0"; // Default fallback
 
         this.menu = new Menu({
@@ -27,18 +29,20 @@ class App {
     }
 
     setupMidnightWatcher() {
-        // Check every minute if the date has changed
         setInterval(() => {
             if (!this.state.isDaily) return;
-            
-            const now = new Date();
-            const currentSeed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
-            
+            const currentSeed = this.calculateDailySeed();
             if (currentSeed !== this.state.dailySeed) {
                 console.log("Midnight detected! Resetting Daily game...");
                 this.startDaily();
             }
         }, 60000);
+    }
+
+    calculateDailySeed() {
+        const now = new Date();
+        const nowUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+        return Math.floor((nowUTC - EPOCH_DATE.getTime()) / (1000 * 60 * 60 * 24));
     }
 
     resetDaily() {
@@ -49,13 +53,12 @@ class App {
     }
 
     async init() {
-        // Fetch version from package.json
         try {
             const response = await fetch('package.json');
             const pkg = await response.json();
             this.version = `v${pkg.version}`;
         } catch (e) {
-            console.warn("Could not fetch version from package.json, using fallback.");
+            console.warn("Could not fetch version from package.json");
         }
         
         this.displayVersion();
@@ -71,7 +74,6 @@ class App {
         const display = document.getElementById('version-display');
         if (display) {
             display.innerText = this.version;
-            console.log("App Version:", this.version);
         }
         document.title = `Octordle ${this.version}`;
     }
@@ -118,13 +120,11 @@ class App {
             return;
         }
 
-        let anyNewSolved = false;
         for (let i = 0; i < 8; i++) {
             if (!this.state.boardStates[i].solved) {
                 this.state.boardStates[i].guesses.push(guess);
                 if (guess === this.state.targetWords[i]) {
                     this.state.boardStates[i].solved = true;
-                    anyNewSolved = true;
                 }
             }
         }
@@ -135,14 +135,6 @@ class App {
         
         this.state.save();
         this.updateUI();
-    }
-
-    showInvalid() {
-        // Handled in BoardView.update()
-    }
-
-    showMessage(txt) {
-        // No longer needed for invalid words
     }
 
     setupTouch() {
@@ -159,8 +151,7 @@ class App {
     }
 
     startDaily() {
-        const d = new Date();
-        const seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+        const seed = this.calculateDailySeed();
         this.resetGame(seed, true);
     }
 
@@ -170,12 +161,12 @@ class App {
     }
 
     resetGame(seed, isDaily) {
-        this.state.reset(seed, isDaily);
-        const rand = mulberry32(seed);
-        for (let i = 0; i < 8; i++) {
-            const word = this.dictionaries.solutions[Math.floor(rand() * this.dictionaries.solutions.length)];
-            this.state.targetWords.push(word);
-        }
+        // Use prefix "0" for Classic mode
+        this.state.reset(seed, isDaily, "0");
+        
+        // New Selection Logic: Shuffle entire list and take first 8
+        const shuffled = seededShuffle(this.dictionaries.classic, seed);
+        this.state.targetWords = shuffled.slice(0, 8);
 
         if (isDaily) this.state.load();
 
@@ -205,5 +196,4 @@ class App {
     }
 }
 
-// Initialize App
 new App();

@@ -1,21 +1,32 @@
 export async function loadDictionaries() {
     try {
-        const [s, a] = await Promise.all([
-            fetch('assets/shuffled_real_wordles.txt'), 
-            fetch('assets/official_allowed_guesses.txt')
+        const [classic, extreme, dictionary] = await Promise.all([
+            fetch('assets/classic.txt'),
+            fetch('assets/extreme.txt'),
+            fetch('assets/dictionary.txt')
         ]);
-        const solutions = (await s.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
-        const extraAllowed = (await a.text()).split(/\s+/).filter(w => w.length === 5).map(w => w.toUpperCase());
+
+        // Helper to process text into a clean array of uppercase words
+        const process = async (res) => (await res.text())
+            .split(/\s+/)
+            .map(w => w.trim().toUpperCase())
+            .filter(w => w.length === 5);
+
+        const classicWords = await process(classic);
+        const extremeWords = await process(extreme);
+        const allAllowed = await process(dictionary);
         
-        // MERGE SOLUTIONS into ALL_ALLOWED
-        const allAllowed = Array.from(new Set([...solutions, ...extraAllowed]));
-        console.log("Dictionary Loaded. Solutions:", solutions.length, "Total Allowed:", allAllowed.length);
+        console.log("Dictionaries Loaded Successfully.");
+        console.log(`Classic: ${classicWords.length}, Extreme: ${extremeWords.length}, Total Allowed: ${allAllowed.length}`);
         
-        return { solutions, allAllowed };
+        return { 
+            classic: classicWords, 
+            extreme: extremeWords, 
+            allAllowed 
+        };
     } catch (err) {
-        console.error("Fetch Error:", err);
-        // Fallback for development if files aren't available
-        const solutions = ["APPLE", "CIGAR", "BRAIN", "BREAD", "BRUSH", "CHAIR", "CHEST", "CHORD"];
-        return { solutions, allAllowed: solutions };
+        console.error("Dictionary Load Error:", err);
+        const fallback = ["APPLE", "CIGAR", "BRAIN", "BREAD", "BRUSH", "CHAIR", "CHEST", "CHORD"];
+        return { classic: fallback, extreme: fallback, allAllowed: fallback };
     }
 }

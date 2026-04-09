@@ -4,6 +4,7 @@ export class StateManager {
     constructor() {
         this.isDaily = true;
         this.dailySeed = 0;
+        this.puzzleId = ""; // e.g. "05f5"
         this.globalGuessCount = 0;
         this.boardStates = []; // { guesses: [], solved: false }
         this.targetWords = [];
@@ -14,7 +15,7 @@ export class StateManager {
     save() {
         if (this.isDaily) {
             const data = {
-                seed: this.dailySeed,
+                puzzleId: this.puzzleId,
                 guesses: this.boardStates.map(b => b.guesses),
                 count: this.globalGuessCount
             };
@@ -28,7 +29,7 @@ export class StateManager {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             const s = JSON.parse(saved);
-            if (s.seed === this.dailySeed) {
+            if (s.puzzleId === this.puzzleId) {
                 this.globalGuessCount = s.count;
                 for (let i = 0; i < 8; i++) {
                     this.boardStates[i].guesses = s.guesses[i] || [];
@@ -37,7 +38,7 @@ export class StateManager {
                     }
                 }
             } else {
-                // Seed mismatch: It's a new day. Clear old progress.
+                // ID mismatch: It's a new day or different mode. Clear old progress.
                 this.clear();
             }
         }
@@ -47,9 +48,10 @@ export class StateManager {
         localStorage.removeItem(STORAGE_KEY);
     }
 
-    reset(seed, isDaily) {
+    reset(seed, isDaily, modePrefix = "0") {
         this.isDaily = isDaily;
         this.dailySeed = seed;
+        this.puzzleId = `${modePrefix}${seed.toString(16)}`;
         this.globalGuessCount = 0;
         this.currentGuess = "";
         this.currentScreenIdx = 0;
