@@ -97,7 +97,6 @@ export class BoardView {
                         
                         // Trigger flip animation only if it's the most recent guess
                         if (r === this.state.globalGuessCount - 1) {
-                            tile.style.animationDelay = `${c * 100}ms`;
                             tile.classList.add('flip');
                         }
                     }
