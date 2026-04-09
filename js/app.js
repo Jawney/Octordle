@@ -46,8 +46,13 @@ class App {
 
     calculateDailySeed() {
         const now = new Date();
-        const nowUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-        return Math.floor((nowUTC - EPOCH_DATE.getTime()) / (1000 * 60 * 60 * 24));
+        // Today's local midnight
+        const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        // Epoch local midnight (Jan 24, 2022)
+        const epochMidnight = new Date(2022, 0, 24).getTime();
+        
+        // Use round to handle potential DST hour shifts safely
+        return Math.round((localMidnight - epochMidnight) / (1000 * 60 * 60 * 24));
     }
 
     resetDaily() {
