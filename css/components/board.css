@@ -85,13 +85,13 @@
 }
 
 .tile[data-state="absent"] {
-    background-color: var(--absent);
+    background-color: var(--absent); /* Solid, opaque grey */
     border-color: var(--absent);
     color: #fff;
-    opacity: 0.7;
 }
 
 .tile[data-state="tbd"] {
+    background-color: #121213; /* Solid cover for TBD tiles */
     border-color: #565758;
     transform: scale(1.05); /* Slight lift for active row letters */
 }

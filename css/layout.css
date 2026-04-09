@@ -7,17 +7,17 @@
 body {
     background-color: #000;
     margin: 0; padding: 0;
-    width: 100vw; height: 100vh; /* Stable height: ignored the suggestion bar */
+    width: 100vw; height: 100vh;
     overflow: hidden;
     overscroll-behavior: none;
 }
 
 #app-shell {
-    /* Stronger, more visible gradient */
-    background: linear-gradient(180deg, #323238 0%, #000000 100%);
+    /* Vertical linear gradient: Moss green to black */
+    background: linear-gradient(180deg, #2d4a2d 0%, #000000 65%);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    width: 100%; height: 100%; /* Pure CSS height */
+    width: 100%; height: 100%;
     display: flex; flex-direction: column;
     overflow: hidden;
     position: absolute;
@@ -27,14 +27,14 @@ body {
 #safe-top {
     height: var(--safe-top);
     flex-shrink: 0;
-    background: #1a1a1b; /* Restored solid color */
+    background: rgba(0, 0, 0, 0.2);
 }
 
 header {
     height: var(--header-h);
     flex-shrink: 0;
-    background: #1a1a1b; /* Restored solid color */
-    border-bottom: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -42,7 +42,7 @@ header {
 }
 
 header h1 {
-    font-size: 1.3rem; /* Further increased for a larger, bolder look */
+    font-size: 1.3rem;
     margin: 0;
     font-weight: 900;
     letter-spacing: 1px;
@@ -51,7 +51,7 @@ header h1 {
 }
 
 #hamburger {
-    z-index: 10; /* Ensure it stays above the absolute h1 */
+    z-index: 10;
 }
 
 #main-container {
@@ -59,7 +59,7 @@ header h1 {
     flex-shrink: 0;
     display: flex; flex-direction: column;
     overflow: hidden;
-    background: var(--bg);
+    background: transparent; /* Let shell gradient show through */
     justify-content: flex-start;
 }
 
@@ -67,15 +67,15 @@ header h1 {
     height: var(--nav-h);
     flex-shrink: 0;
     display: flex; gap: 10px; align-items: center; justify-content: center;
-    background: var(--bg);
+    background: transparent;
 }
 
 #dock {
     height: var(--dock-h);
     flex-shrink: 0;
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    padding-bottom: 0; /* Clear padding to fit budget */
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 0;
     box-sizing: border-box;
 }
 
