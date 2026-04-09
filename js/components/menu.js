@@ -42,8 +42,12 @@ export class Menu {
         closeBtn.onclick = () => this.toggle();
         this.overlay.appendChild(closeBtn);
 
-        const dailyBtn = this.createMenuButton('Daily Octordle', () => {
-            this.callbacks.startDaily();
+        const dailyClassicBtn = this.createMenuButton('Daily - Classic', () => {
+            this.callbacks.startDailyClassic();
+            this.toggle();
+        });
+        const dailyExtremeBtn = this.createMenuButton('Daily - Extreme', () => {
+            this.callbacks.startDailyExtreme();
             this.toggle();
         });
         const practiceBtn = this.createMenuButton('Practice Mode', () => {
@@ -57,7 +61,8 @@ export class Menu {
         resetDailyBtn.style.marginTop = '60px'; // Separate from modes, keep in visible area
         resetDailyBtn.style.background = '#8e1c1c'; // Dark red for "destructive" action
 
-        this.overlay.appendChild(dailyBtn);
+        this.overlay.appendChild(dailyClassicBtn);
+        this.overlay.appendChild(dailyExtremeBtn);
         this.overlay.appendChild(practiceBtn);
         this.overlay.appendChild(resetDailyBtn);
         

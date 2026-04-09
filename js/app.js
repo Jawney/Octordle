@@ -16,10 +16,11 @@ class App {
         this.keyboard = new Keyboard(this.state);
         this.summaryView = new SummaryView(this.state);
         this.dictionaries = { classic: [], extreme: [], allAllowed: [] };
-        this.version = "v1.8.0"; // Default fallback
+        this.version = "v1.10.0"; // Default fallback
 
         this.menu = new Menu({
-            startDaily: () => this.startDaily(),
+            startDailyClassic: () => this.startDailyClassic(),
+            startDailyExtreme: () => this.startDailyExtreme(),
             startPractice: () => this.startPractice(),
             resetDaily: () => this.resetDaily()
         });
@@ -34,7 +35,11 @@ class App {
             const currentSeed = this.calculateDailySeed();
             if (currentSeed !== this.state.dailySeed) {
                 console.log("Midnight detected! Resetting Daily game...");
-                this.startDaily();
+                if (this.state.puzzleId.startsWith("9")) {
+                    this.startDailyExtreme();
+                } else {
+                    this.startDailyClassic();
+                }
             }
         }, 60000);
     }
@@ -46,9 +51,11 @@ class App {
     }
 
     resetDaily() {
-        if (confirm("Reset Daily Game? This will wipe your progress for today.")) {
-            this.state.clear();
-            this.startDaily();
+        if (confirm("Reset ALL Daily Games? This will wipe your progress for both Classic and Extreme modes today.")) {
+            this.state.clearAll();
+            // Restart whichever mode we are currently in
+            if (this.state.puzzleId.startsWith("9")) this.startDailyExtreme();
+            else this.startDailyClassic();
         }
     }
 
@@ -67,7 +74,7 @@ class App {
         initViewport();
         this.setupInput();
         this.setupTouch();
-        this.startDaily();
+        this.startDailyClassic();
     }
 
     displayVersion() {
@@ -150,22 +157,27 @@ class App {
         }, false);
     }
 
-    startDaily() {
+    startDailyClassic() {
         const seed = this.calculateDailySeed();
-        this.resetGame(seed, true);
+        this.resetGame(seed, true, "classic");
+    }
+
+    startDailyExtreme() {
+        const seed = this.calculateDailySeed();
+        this.resetGame(seed, true, "extreme");
     }
 
     startPractice() {
         const seed = Math.floor(Math.random() * 1000000);
-        this.resetGame(seed, false);
+        this.resetGame(seed, false, "classic");
     }
 
-    resetGame(seed, isDaily) {
-        // Use prefix "0" for Classic mode
-        this.state.reset(seed, isDaily, "0");
+    resetGame(seed, isDaily, mode = "classic") {
+        const prefix = mode === "extreme" ? "9" : "0";
+        this.state.reset(seed, isDaily, prefix);
         
-        // New Selection Logic: Shuffle entire list and take first 8
-        const shuffled = seededShuffle(this.dictionaries.classic, seed);
+        const dictionary = mode === "extreme" ? this.dictionaries.extreme : this.dictionaries.classic;
+        const shuffled = seededShuffle(dictionary, seed);
         this.state.targetWords = shuffled.slice(0, 8);
 
         if (isDaily) this.state.load();
@@ -183,7 +195,11 @@ class App {
     updateUI() {
         const modeText = document.getElementById('mode-text');
         if (modeText) {
-            modeText.textContent = (this.state.isDaily ? "DAILY" : "PRACTICE") + " OCTORDLE";
+            let label = "PRACTICE";
+            if (this.state.isDaily) {
+                label = this.state.puzzleId.startsWith("9") ? "DAILY EXTREME" : "DAILY CLASSIC";
+            }
+            modeText.textContent = label + " OCTORDLE";
         }
         this.boardView.update();
         
