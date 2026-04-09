@@ -19,4 +19,10 @@
     --key-h: 24px;
     /* (3 rows * 24px) + (2 gaps * 4px) = 80px */
     --dock-h: 80px;
+
+    /* Visual Polish Additions */
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    --glass-bg: rgba(26, 26, 27, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.1);
 }

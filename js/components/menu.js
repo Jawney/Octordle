@@ -28,9 +28,14 @@ export class Menu {
         this.overlay.style.cssText = `
             position: absolute; top: var(--safe-top); right: -250px; width: 250px; 
             height: calc(100% - var(--safe-top));
-            background: #1a1a1b; z-index: 10000; transition: right 0.3s ease;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.5); padding-top: 60px;
+            background: rgba(26, 26, 27, 0.7); /* More transparent for better blur visibility */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 100000; /* Extremely high to clear all other elements */
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5); padding-top: 60px;
             display: flex; flex-direction: column; gap: 20px;
+            border-left: 1px solid var(--glass-border);
         `;
 
         const closeBtn = document.createElement('button');

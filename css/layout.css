@@ -13,7 +13,8 @@ body {
 }
 
 #app-shell {
-    background-color: var(--bg);
+    /* Stronger, more visible gradient */
+    background: linear-gradient(180deg, #323238 0%, #000000 100%);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     width: 100%; height: 100%; /* Pure CSS height */
@@ -26,12 +27,13 @@ body {
 #safe-top {
     height: var(--safe-top);
     flex-shrink: 0;
+    background: #1a1a1b; /* Restored solid color */
 }
 
 header {
     height: var(--header-h);
     flex-shrink: 0;
-    background: #1a1a1b;
+    background: #1a1a1b; /* Restored solid color */
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;

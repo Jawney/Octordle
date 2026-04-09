@@ -94,13 +94,27 @@ export class BoardView {
                         const tile = row.children[c];
                         tile.innerText = guess[c];
                         tile.setAttribute('data-state', feedback[c]);
+                        
+                        // Trigger flip animation only if it's the most recent guess
+                        if (r === this.state.globalGuessCount - 1) {
+                            tile.style.animationDelay = `${c * 100}ms`;
+                            tile.classList.add('flip');
+                        }
                     }
                 } else if (r === this.state.globalGuessCount && !boardState.solved) {
                     for (let c = 0; c < 5; c++) {
                         const tile = row.children[c];
                         const char = this.state.currentGuess[c] || "";
+                        const oldText = tile.innerText;
                         tile.innerText = char;
                         tile.setAttribute('data-state', char ? 'tbd' : 'empty');
+                        
+                        // Trigger pop animation when a new letter is added
+                        if (char && !oldText) {
+                            tile.classList.remove('pop');
+                            void tile.offsetWidth; // Force reflow
+                            tile.classList.add('pop');
+                        }
                     }
                 } else {
                     for (let c = 0; c < 5; c++) {

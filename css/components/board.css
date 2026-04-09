@@ -17,10 +17,11 @@
 }
 
 .board-box {
-    background: #1a1a1b;
-    border: 1px solid #333;
-    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.02); /* Very subtle card look */
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Same 1px as before, just lighter */
+    border-radius: 8px;
     padding: 2px 30px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3); /* Adds depth without affecting size */
 }
 
 .grid {
@@ -39,33 +40,71 @@
 .tile {
     border: 2px solid var(--border);
     display: flex; align-items: center; justify-content: center;
-    font-size: 17px; /* Reduced for 21px rows */
-    font-weight: 800; text-transform: uppercase;
+    font-size: 13px; /* Reduced for 21px rows */
+    font-weight: 900; text-transform: uppercase;
     background: var(--bg); color: var(--text);
-    border-radius: 2px;
+    border-radius: 3px;
+    transition: transform 0.1s ease, background-color 0.4s ease, border-color 0.4s ease;
+    box-shadow: var(--shadow);
 }
 
+/* Pop animation for typing */
+.tile.pop {
+    animation: pop 0.1s ease-in-out;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Flip animation for submitting */
+.tile.flip {
+    animation: flip 0.5s ease-in-out;
+}
+
+@keyframes flip {
+    0% { transform: rotateX(0); }
+    50% { transform: rotateX(90deg); }
+    100% { transform: rotateX(0); }
+}
 
 .tile[data-state="correct"] {
-    background-color: var(--correct);
+    background: linear-gradient(180deg, #5fb05a 0%, var(--correct) 100%);
     border-color: var(--correct);
     color: #fff;
+    box-shadow: var(--inner-glow);
 }
 
 .tile[data-state="present"] {
-    background-color: var(--present);
+    background: linear-gradient(180deg, #d3bc4e 0%, var(--present) 100%);
     border-color: var(--present);
     color: #fff;
+    box-shadow: var(--inner-glow);
 }
 
 .tile[data-state="absent"] {
     background-color: var(--absent);
     border-color: var(--absent);
     color: #fff;
+    opacity: 0.7;
 }
 
 .tile[data-state="tbd"] {
     border-color: #565758;
+    transform: scale(1.05); /* Slight lift for active row letters */
+}
+
+/* Shake animation for invalid words */
+.row.invalid {
+    animation: shake 0.4s linear;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-4px); }
+    40%, 80% { transform: translateX(4px); }
 }
 
 .row.invalid .tile {
@@ -76,26 +115,27 @@
 .dot-pair {
     display: flex;
     gap: 4px;
-    padding: 3px 5px;
-    border-radius: 10px;
+    padding: 2px 4px; /* Tightened padding */
+    border-radius: 8px;
     border: 1px solid transparent;
     transition: all 0.2s;
     align-items: center;
 }
 
 .dot-pair.active {
-    border-color: #fff; /* The box around the pair */
+    border-color: rgba(255, 255, 255, 0.8);
     background: rgba(255, 255, 255, 0.1);
 }
 
 .dot {
-    width: 6px;
-    height: 6px;
+    width: 8px; /* Slightly reduced to clear dock */
+    height: 8px;
     border-radius: 50%;
-    background: #333;
+    background: #444;
     transition: all 0.2s;
 }
 
 .dot[data-solved="true"] {
-    background: var(--correct);
+    background: #6aaa64; /* Brighter, more vibrant green */
+    box-shadow: 0 0 8px rgba(106, 170, 100, 0.5); /* Subtle glow */
 }
